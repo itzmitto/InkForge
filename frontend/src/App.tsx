@@ -48,6 +48,7 @@ function App() {
   const [showGrid, setShowGrid] = useState(false);
   const [showTimeline, setShowTimeline] = useState(true);
   const [brushSize, setBrushSize] = useState(8);
+  const [brushOpacity, setBrushOpacity] = useState(100);
   const canvasRef = useRef<CanvasSurfaceHandle>(null);
   const [historyState, setHistoryState] = useState({
     canUndo: false,
@@ -237,6 +238,7 @@ function App() {
                     : "none"
                 }
                 brushSize={brushSize}
+                brushOpacity={brushOpacity}
                 pencilGrade={pencilGrade}
               />
               <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.15em] text-[#b4b0a8]">
@@ -358,6 +360,28 @@ function App() {
               <span className="text-[#9b9ba0]">Size</span>
               <span>{brushSize}px</span>
             </div>
+            {(activeTool === "pencil" || activeTool === "ink") && (
+              <div className="mt-5">
+                <div className="mb-3 flex items-center justify-between text-xs">
+                  <label htmlFor="brush-opacity" className="text-[#9b9ba0]">
+                    Opacity
+                  </label>
+                  <span>{brushOpacity}%</span>
+                </div>
+                <input
+                  id="brush-opacity"
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value={brushOpacity}
+                  onChange={(event) =>
+                    setBrushOpacity(Number(event.target.value))
+                  }
+                  className="w-full accent-[#cba879]"
+                />
+              </div>
+            )}
             {activeTool === "pencil" && (
               <div className="mt-5">
                 <p className="mb-3 text-xs text-[#9b9ba0]">

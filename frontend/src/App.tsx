@@ -1,3 +1,4 @@
+import BrushSizePresets from "./components/BrushSizePresets";
 import { useEffect, useRef, useState } from "react";
 import CanvasSurface from "./CanvasSurface";
 import type { CanvasSurfaceHandle } from "./CanvasSurface";
@@ -92,6 +93,50 @@ function App() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [historyState.canUndo, historyState.canRedo]);
+
+  useEffect(() => {
+    const shortcuts: Record<string, ToolId> = {
+      b: "pencil",
+      i: "ink",
+      e: "eraser",
+      v: "select",
+      h: "hand",
+    };
+
+    function handleToolShortcut(event: KeyboardEvent) {
+      if (
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target.closest("input, textarea, select, [contenteditable]"))
+      ) {
+        return;
+      }
+
+      const nextTool = shortcuts[event.key.toLowerCase()];
+
+      if (!nextTool) return;
+
+      event.preventDefault();
+      setActiveTool(nextTool);
+    }
+
+    window.addEventListener("keydown", handleToolShortcut);
+
+    return () => {
+      window.removeEventListener("keydown", handleToolShortcut);
+    };
+  }, []);
 
   const selectedTool = tools.find((tool) => tool.id === activeTool)!;
 
@@ -195,6 +240,10 @@ function App() {
                 className="w-24 accent-[#cba879]"
                 aria-label="Brush size"
               />
+                <BrushSizePresets
+                  value={brushSize}
+                  onChange={setBrushSize}
+                />
               <span className="w-8 text-right text-xs">{brushSize}px</span>
             </div>
             <div className="flex items-center gap-2">

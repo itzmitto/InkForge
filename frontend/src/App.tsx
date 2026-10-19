@@ -221,9 +221,9 @@ function App() {
             </div>
           </div>
 
-          <section className="workspace-grid relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-10">
+          <section className="workspace-grid relative min-h-0 flex-1 overflow-auto p-4">
             <div
-              className="artboard relative aspect-[4/3] w-full max-w-[760px] shrink-0 overflow-hidden bg-[#f3f0e8] shadow-[0_20px_80px_#00000065]"
+              className="artboard relative aspect-[4/3] mx-auto w-[1100px] max-w-none overflow-hidden bg-[#f3f0e8] shadow-[0_20px_80px_#00000065]"
               style={{ transform: `scale(${zoom / 100})` }}
             >
               {showGrid && <div className="paper-grid absolute inset-0" />}

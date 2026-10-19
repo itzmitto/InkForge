@@ -1,82 +1,145 @@
 import { useRef } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
+import {
+  drawPencilDot,
+  drawPencilStroke,
+} from "./brushes/pencil";
+import type {
+  PencilGrade,
+  PencilPoint,
+} from "./brushes/pencil";
+
+type DrawingTool = "pencil" | "ink" | "none";
 
 type CanvasSurfaceProps = {
-  enabled: boolean;
+  tool: DrawingTool;
   brushSize: number;
-};
-
-type Point = {
-  x: number;
-  y: number;
+  pencilGrade: PencilGrade;
 };
 
 const WIDTH = 1920;
 const HEIGHT = 1440;
 
 export default function CanvasSurface({
-  enabled,
+  tool,
   brushSize,
+  pencilGrade,
 }: CanvasSurfaceProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const lastPoint = useRef<Point | null>(null);
+  const lastPoint = useRef<PencilPoint | null>(null);
+  const activePointerId = useRef<number | null>(null);
 
-  function getPoint(event: ReactPointerEvent<HTMLCanvasElement>): Point {
+  function getPoint(
+    event: ReactPointerEvent<HTMLCanvasElement>
+  ): PencilPoint {
     const rect = event.currentTarget.getBoundingClientRect();
 
     return {
-      x: Math.max(0, Math.min(WIDTH, (event.clientX - rect.left) * WIDTH / rect.width)),
-      y: Math.max(0, Math.min(HEIGHT, (event.clientY - rect.top) * HEIGHT / rect.height)),
+      x: Math.max(
+        0,
+        Math.min(
+          WIDTH,
+          ((event.clientX - rect.left) * WIDTH) / rect.width
+        )
+      ),
+      y: Math.max(
+        0,
+        Math.min(
+          HEIGHT,
+          ((event.clientY - rect.top) * HEIGHT) / rect.height
+        )
+      ),
+      pressure:
+        event.pointerType === "pen"
+          ? Math.max(0.1, Math.min(1, event.pressure))
+          : 0.75,
     };
   }
 
   function getContext() {
-    const context = canvasRef.current?.getContext("2d");
-
-    if (!context) return null;
-
-    context.strokeStyle = "#292620";
-    context.fillStyle = "#292620";
-    context.lineWidth = brushSize;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-
-    return context;
+    return canvasRef.current?.getContext("2d") ?? null;
   }
 
-  function handlePointerDown(event: ReactPointerEvent<HTMLCanvasElement>) {
-    if (!enabled || event.button !== 0) return;
-
-    const context = getContext();
-    if (!context) return;
-
-    event.currentTarget.setPointerCapture(event.pointerId);
-
-    const point = getPoint(event);
-    lastPoint.current = point;
-
+  function drawInkDot(
+    context: CanvasRenderingContext2D,
+    point: PencilPoint
+  ) {
+    context.fillStyle = "#292620";
     context.beginPath();
     context.arc(point.x, point.y, brushSize / 2, 0, Math.PI * 2);
     context.fill();
   }
 
-  function handlePointerMove(event: ReactPointerEvent<HTMLCanvasElement>) {
-    if (!enabled || !lastPoint.current) return;
+  function drawInkLine(
+    context: CanvasRenderingContext2D,
+    from: PencilPoint,
+    to: PencilPoint
+  ) {
+    context.strokeStyle = "#292620";
+    context.lineWidth = brushSize;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+
+    context.beginPath();
+    context.moveTo(from.x, from.y);
+    context.lineTo(to.x, to.y);
+    context.stroke();
+  }
+
+  function handlePointerDown(
+    event: ReactPointerEvent<HTMLCanvasElement>
+  ) {
+    if (tool === "none" || event.button !== 0) return;
+    if (activePointerId.current !== null) return;
+
+    const context = getContext();
+    if (!context) return;
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+    activePointerId.current = event.pointerId;
+
+    const point = getPoint(event);
+    lastPoint.current = point;
+
+    if (tool === "pencil") {
+      drawPencilDot(context, point, brushSize, pencilGrade);
+    } else {
+      drawInkDot(context, point);
+    }
+  }
+
+  function handlePointerMove(
+    event: ReactPointerEvent<HTMLCanvasElement>
+  ) {
+    if (activePointerId.current !== event.pointerId) return;
+    if (!lastPoint.current || tool === "none") return;
 
     const context = getContext();
     if (!context) return;
 
     const point = getPoint(event);
 
-    context.beginPath();
-    context.moveTo(lastPoint.current.x, lastPoint.current.y);
-    context.lineTo(point.x, point.y);
-    context.stroke();
+    if (tool === "pencil") {
+      drawPencilStroke(
+        context,
+        lastPoint.current,
+        point,
+        brushSize,
+        pencilGrade
+      );
+    } else {
+      drawInkLine(context, lastPoint.current, point);
+    }
 
     lastPoint.current = point;
   }
 
-  function handlePointerUp(event: ReactPointerEvent<HTMLCanvasElement>) {
+  function handlePointerUp(
+    event: ReactPointerEvent<HTMLCanvasElement>
+  ) {
+    if (activePointerId.current !== event.pointerId) return;
+
+    activePointerId.current = null;
     lastPoint.current = null;
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -91,7 +154,7 @@ export default function CanvasSurface({
       height={HEIGHT}
       aria-label="InkForge drawing canvas"
       className={`absolute inset-0 h-full w-full ${
-        enabled ? "cursor-crosshair" : "cursor-default"
+        tool === "none" ? "cursor-default" : "cursor-crosshair"
       }`}
       style={{ touchAction: "none" }}
       onPointerDown={handlePointerDown}

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import CanvasSurface from "./CanvasSurface";
+import { PENCIL_GRADES } from "./brushes/pencil";
+import type { PencilGrade } from "./brushes/pencil";
 import {
   Brush, ChevronDown, CircleHelp, Eye, EyeOff,
   FilePlus2, Grid2X2, Hand, Layers3, LockKeyhole,
@@ -45,6 +47,7 @@ function App() {
   const [showGrid, setShowGrid] = useState(false);
   const [showTimeline, setShowTimeline] = useState(true);
   const [brushSize, setBrushSize] = useState(8);
+  const [pencilGrade, setPencilGrade] = useState<PencilGrade>("HB");
 
   const selectedTool = tools.find((tool) => tool.id === activeTool)!;
 
@@ -163,8 +166,15 @@ function App() {
             >
               {showGrid && <div className="paper-grid absolute inset-0" />}
               <CanvasSurface
-                enabled={activeTool === "pencil" || activeTool === "ink"}
+                tool={
+                  activeTool === "pencil"
+                    ? "pencil"
+                    : activeTool === "ink"
+                      ? "ink"
+                      : "none"
+                }
                 brushSize={brushSize}
+                pencilGrade={pencilGrade}
               />
               <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.15em] text-[#b4b0a8]">
                 InkForge / Artboard 01
@@ -285,6 +295,30 @@ function App() {
               <span className="text-[#9b9ba0]">Size</span>
               <span>{brushSize}px</span>
             </div>
+            {activeTool === "pencil" && (
+              <div className="mt-5">
+                <p className="mb-3 text-xs text-[#9b9ba0]">
+                  Graphite Grade
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  {PENCIL_GRADES.map((grade) => (
+                    <button
+                      key={grade}
+                      type="button"
+                      onClick={() => setPencilGrade(grade)}
+                      aria-pressed={pencilGrade === grade}
+                      className={`rounded-md border py-2 text-xs ${
+                        pencilGrade === grade
+                          ? "border-[#cba879] bg-[#cba879]/15 text-[#cba879]"
+                          : "border-white/10 bg-[#25262b] text-[#a5a5aa] hover:bg-white/10"
+                      }`}
+                    >
+                      {grade}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <p className="mt-5 text-[11px] leading-relaxed text-[#77777d]">
               Brush rendering and pressure sensitivity will be added in upcoming pull requests.
             </p>

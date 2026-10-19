@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CanvasSurface from "./CanvasSurface";
+import type { CanvasSurfaceHandle } from "./CanvasSurface";
 import { PENCIL_GRADES } from "./brushes/pencil";
 import type { PencilGrade } from "./brushes/pencil";
 import {
@@ -47,7 +48,49 @@ function App() {
   const [showGrid, setShowGrid] = useState(false);
   const [showTimeline, setShowTimeline] = useState(true);
   const [brushSize, setBrushSize] = useState(8);
+  const canvasRef = useRef<CanvasSurfaceHandle>(null);
+  const [historyState, setHistoryState] = useState({
+    canUndo: false,
+    canRedo: false,
+  });
   const [pencilGrade, setPencilGrade] = useState<PencilGrade>("HB");
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+      ) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+
+      if (key === "z" && !event.shiftKey && historyState.canUndo) {
+        event.preventDefault();
+        canvasRef.current?.undo();
+      } else if (
+        ((key === "z" && event.shiftKey) || key === "y") &&
+        historyState.canRedo
+      ) {
+        event.preventDefault();
+        canvasRef.current?.redo();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [historyState.canUndo, historyState.canRedo]);
 
   const selectedTool = tools.find((tool) => tool.id === activeTool)!;
 
@@ -153,9 +196,27 @@ function App() {
               />
               <span className="w-8 text-right text-xs">{brushSize}px</span>
             </div>
-            <div className="flex items-center gap-2 text-[#65656b]">
-              <Undo2 size={18} aria-label="Undo unavailable" />
-              <Redo2 size={18} aria-label="Redo unavailable" />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={!historyState.canUndo}
+                onClick={() => canvasRef.current?.undo()}
+                title="Undo (Ctrl+Z)"
+                aria-label="Undo"
+                className="rounded-lg p-2 text-[#cba879] hover:bg-white/10 disabled:cursor-not-allowed disabled:text-[#65656b]"
+              >
+                <Undo2 size={18} />
+              </button>
+              <button
+                type="button"
+                disabled={!historyState.canRedo}
+                onClick={() => canvasRef.current?.redo()}
+                title="Redo (Ctrl+Shift+Z)"
+                aria-label="Redo"
+                className="rounded-lg p-2 text-[#cba879] hover:bg-white/10 disabled:cursor-not-allowed disabled:text-[#65656b]"
+              >
+                <Redo2 size={18} />
+              </button>
             </div>
           </div>
 
@@ -166,6 +227,8 @@ function App() {
             >
               {showGrid && <div className="paper-grid absolute inset-0" />}
               <CanvasSurface
+                ref={canvasRef}
+                onHistoryChange={setHistoryState}
                 tool={
                   activeTool === "pencil" ||
                   activeTool === "ink" ||

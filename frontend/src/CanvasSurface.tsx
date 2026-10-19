@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import {
   drawPencilDot,
@@ -9,25 +9,134 @@ import type {
   PencilPoint,
 } from "./brushes/pencil";
 
-type DrawingTool = "pencil" | "ink" | "eraser" | "none";
+type DrawingTool = "pencil" | "ink" | "eraser";
+type SelectedTool = DrawingTool | "none";
+
+type Stroke = {
+  tool: DrawingTool;
+  size: number;
+  grade: PencilGrade;
+  seed: number;
+  points: PencilPoint[];
+};
+
+type HistoryState = {
+  canUndo: boolean;
+  canRedo: boolean;
+};
 
 type CanvasSurfaceProps = {
-  tool: DrawingTool;
+  tool: SelectedTool;
   brushSize: number;
   pencilGrade: PencilGrade;
+  onHistoryChange?: (state: HistoryState) => void;
+};
+
+export type CanvasSurfaceHandle = {
+  undo: () => void;
+  redo: () => void;
 };
 
 const WIDTH = 1920;
 const HEIGHT = 1440;
 
-export default function CanvasSurface({
-  tool,
-  brushSize,
-  pencilGrade,
-}: CanvasSurfaceProps) {
+function createRandom(seed: number) {
+  let state = seed || 1;
+
+  return () => {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return (state >>> 0) / 4294967296;
+  };
+}
+
+function drawDot(
+  context: CanvasRenderingContext2D,
+  stroke: Stroke,
+  point: PencilPoint,
+  random: () => number
+) {
+  if (stroke.tool === "pencil") {
+    drawPencilDot(
+      context,
+      point,
+      stroke.size,
+      stroke.grade,
+      random
+    );
+    return;
+  }
+
+  context.save();
+
+  if (stroke.tool === "eraser") {
+    context.globalCompositeOperation = "destination-out";
+  }
+
+  context.fillStyle = "#292620";
+  context.beginPath();
+  context.arc(point.x, point.y, stroke.size / 2, 0, Math.PI * 2);
+  context.fill();
+  context.restore();
+}
+
+function drawSegment(
+  context: CanvasRenderingContext2D,
+  stroke: Stroke,
+  from: PencilPoint,
+  to: PencilPoint,
+  random: () => number
+) {
+  if (stroke.tool === "pencil") {
+    drawPencilStroke(
+      context,
+      from,
+      to,
+      stroke.size,
+      stroke.grade,
+      random
+    );
+    return;
+  }
+
+  context.save();
+
+  if (stroke.tool === "eraser") {
+    context.globalCompositeOperation = "destination-out";
+  }
+
+  context.strokeStyle = "#292620";
+  context.lineWidth = stroke.size;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+
+  context.beginPath();
+  context.moveTo(from.x, from.y);
+  context.lineTo(to.x, to.y);
+  context.stroke();
+
+  context.restore();
+}
+
+const CanvasSurface = forwardRef<
+  CanvasSurfaceHandle,
+  CanvasSurfaceProps
+>(function CanvasSurface(
+  { tool, brushSize, pencilGrade, onHistoryChange },
+  ref
+) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const lastPoint = useRef<PencilPoint | null>(null);
-  const activePointerId = useRef<number | null>(null);
+  const strokes = useRef<Stroke[]>([]);
+  const redoStack = useRef<Stroke[]>([]);
+  const activeStroke = useRef<Stroke | null>(null);
+  const activePointer = useRef<number | null>(null);
+  const activeRandom = useRef<(() => number) | null>(null);
+  const sequence = useRef(0);
+
+  function getContext() {
+    return canvasRef.current?.getContext("2d") ?? null;
+  }
 
   function getPoint(
     event: ReactPointerEvent<HTMLCanvasElement>
@@ -39,14 +148,14 @@ export default function CanvasSurface({
         0,
         Math.min(
           WIDTH,
-          ((event.clientX - rect.left) * WIDTH) / rect.width
+          ((event.clientX - rect.left) / rect.width) * WIDTH
         )
       ),
       y: Math.max(
         0,
         Math.min(
           HEIGHT,
-          ((event.clientY - rect.top) * HEIGHT) / rect.height
+          ((event.clientY - rect.top) / rect.height) * HEIGHT
         )
       ),
       pressure:
@@ -56,138 +165,156 @@ export default function CanvasSurface({
     };
   }
 
-  function getContext() {
-    return canvasRef.current?.getContext("2d") ?? null;
+  function updateHistory() {
+    onHistoryChange?.({
+      canUndo: strokes.current.length > 0,
+      canRedo: redoStack.current.length > 0,
+    });
   }
 
-  function drawInkDot(
-    context: CanvasRenderingContext2D,
-    point: PencilPoint
-  ) {
-    context.fillStyle = "#292620";
-    context.beginPath();
-    context.arc(point.x, point.y, brushSize / 2, 0, Math.PI * 2);
-    context.fill();
+  function redraw() {
+    const context = getContext();
+    if (!context) return;
+
+    context.clearRect(0, 0, WIDTH, HEIGHT);
+
+    for (const stroke of strokes.current) {
+      if (stroke.points.length === 0) continue;
+
+      const random = createRandom(stroke.seed);
+
+      drawDot(context, stroke, stroke.points[0], random);
+
+      for (let i = 1; i < stroke.points.length; i++) {
+        drawSegment(
+          context,
+          stroke,
+          stroke.points[i - 1],
+          stroke.points[i],
+          random
+        );
+      }
+    }
   }
 
-  function drawInkLine(
-    context: CanvasRenderingContext2D,
-    from: PencilPoint,
-    to: PencilPoint
-  ) {
-    context.strokeStyle = "#292620";
-    context.lineWidth = brushSize;
-    context.lineCap = "round";
-    context.lineJoin = "round";
+  useImperativeHandle(ref, () => ({
+    undo() {
+      if (activeStroke.current) return;
 
-    context.beginPath();
-    context.moveTo(from.x, from.y);
-    context.lineTo(to.x, to.y);
-    context.stroke();
-  }
+      const stroke = strokes.current.pop();
+      if (!stroke) return;
 
-  function eraseDot(
-    context: CanvasRenderingContext2D,
-    point: PencilPoint
-  ) {
-    context.save();
-    context.globalCompositeOperation = "destination-out";
-    context.globalAlpha = 1;
-    context.fillStyle = "#000000";
-    context.beginPath();
-    context.arc(
-      point.x,
-      point.y,
-      Math.max(0.5, brushSize / 2),
-      0,
-      Math.PI * 2
-    );
-    context.fill();
-    context.restore();
-  }
+      redoStack.current.push(stroke);
+      redraw();
+      updateHistory();
+    },
 
-  function eraseLine(
-    context: CanvasRenderingContext2D,
-    from: PencilPoint,
-    to: PencilPoint
-  ) {
-    context.save();
-    context.globalCompositeOperation = "destination-out";
-    context.globalAlpha = 1;
-    context.strokeStyle = "#000000";
-    context.lineWidth = brushSize;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.beginPath();
-    context.moveTo(from.x, from.y);
-    context.lineTo(to.x, to.y);
-    context.stroke();
-    context.restore();
-  }
+    redo() {
+      if (activeStroke.current) return;
+
+      const stroke = redoStack.current.pop();
+      if (!stroke) return;
+
+      strokes.current.push(stroke);
+      redraw();
+      updateHistory();
+    },
+  }));
 
   function handlePointerDown(
     event: ReactPointerEvent<HTMLCanvasElement>
   ) {
     if (tool === "none" || event.button !== 0) return;
-    if (activePointerId.current !== null) return;
+    if (activePointer.current !== null) return;
 
     const context = getContext();
     if (!context) return;
 
-    event.currentTarget.setPointerCapture(event.pointerId);
-    activePointerId.current = event.pointerId;
-
     const point = getPoint(event);
-    lastPoint.current = point;
+    const seed = (++sequence.current * 2654435761) >>> 0;
 
-    if (tool === "pencil") {
-      drawPencilDot(context, point, brushSize, pencilGrade);
-    } else if (tool === "eraser") {
-      eraseDot(context, point);
-    } else {
-      drawInkDot(context, point);
-    }
+    const stroke: Stroke = {
+      tool,
+      size: brushSize,
+      grade: pencilGrade,
+      seed,
+      points: [point],
+    };
+
+    activeStroke.current = stroke;
+    activePointer.current = event.pointerId;
+    activeRandom.current = createRandom(seed);
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+
+    drawDot(context, stroke, point, activeRandom.current);
   }
 
   function handlePointerMove(
     event: ReactPointerEvent<HTMLCanvasElement>
   ) {
-    if (activePointerId.current !== event.pointerId) return;
-    if (!lastPoint.current || tool === "none") return;
+    if (activePointer.current !== event.pointerId) return;
 
+    const stroke = activeStroke.current;
     const context = getContext();
-    if (!context) return;
+    const random = activeRandom.current;
+
+    if (!stroke || !context || !random) return;
 
     const point = getPoint(event);
+    const previous = stroke.points[stroke.points.length - 1];
 
-    if (tool === "pencil") {
-      drawPencilStroke(
-        context,
-        lastPoint.current,
-        point,
-        brushSize,
-        pencilGrade
-      );
-    } else if (tool === "eraser") {
-      eraseLine(context, lastPoint.current, point);
-    } else {
-      drawInkLine(context, lastPoint.current, point);
+    if (
+      previous.x === point.x &&
+      previous.y === point.y &&
+      previous.pressure === point.pressure
+    ) {
+      return;
     }
 
-    lastPoint.current = point;
+    stroke.points.push(point);
+
+    drawSegment(context, stroke, previous, point, random);
+  }
+
+  function releasePointer(
+    event: ReactPointerEvent<HTMLCanvasElement>
+  ) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    activeStroke.current = null;
+    activePointer.current = null;
+    activeRandom.current = null;
   }
 
   function handlePointerUp(
     event: ReactPointerEvent<HTMLCanvasElement>
   ) {
-    if (activePointerId.current !== event.pointerId) return;
+    if (activePointer.current !== event.pointerId) return;
 
-    activePointerId.current = null;
-    lastPoint.current = null;
+    handlePointerMove(event);
 
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
+    const stroke = activeStroke.current;
+
+    if (stroke) {
+      strokes.current.push(stroke);
+      redoStack.current = [];
     }
+
+    releasePointer(event);
+    updateHistory();
+  }
+
+  function handlePointerCancel(
+    event: ReactPointerEvent<HTMLCanvasElement>
+  ) {
+    if (activePointer.current !== event.pointerId) return;
+
+    releasePointer(event);
+    redraw();
+    updateHistory();
   }
 
   return (
@@ -203,7 +330,9 @@ export default function CanvasSurface({
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
     />
   );
-}
+});
+
+export default CanvasSurface;

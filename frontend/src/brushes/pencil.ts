@@ -27,7 +27,8 @@ function stamp(
   context: CanvasRenderingContext2D,
   point: PencilPoint,
   size: number,
-  grade: PencilGrade
+  grade: PencilGrade,
+  random: () => number
 ) {
   const preset = presets[grade];
   const pressure = Math.max(0.1, Math.min(1, point.pressure));
@@ -54,19 +55,19 @@ function stamp(
   context.fill();
 
   for (let i = 0; i < preset.grain; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const distance = Math.sqrt(Math.random()) * radius;
+    const angle = random() * Math.PI * 2;
+    const distance = Math.sqrt(random()) * radius;
     const x = point.x + Math.cos(angle) * distance;
     const y = point.y + Math.sin(angle) * distance;
 
     context.globalAlpha =
-      preset.opacity * (0.15 + Math.random() * 0.4);
+      preset.opacity * (0.15 + random() * 0.4);
 
     context.beginPath();
     context.arc(
       x,
       y,
-      Math.max(0.2, radius * (0.05 + Math.random() * 0.1)),
+      Math.max(0.2, radius * (0.05 + random() * 0.1)),
       0,
       Math.PI * 2
     );
@@ -80,9 +81,10 @@ export function drawPencilDot(
   context: CanvasRenderingContext2D,
   point: PencilPoint,
   size: number,
-  grade: PencilGrade
+  grade: PencilGrade,
+  random: () => number = Math.random
 ) {
-  stamp(context, point, size, grade);
+  stamp(context, point, size, grade, random);
 }
 
 export function drawPencilStroke(
@@ -90,7 +92,8 @@ export function drawPencilStroke(
   from: PencilPoint,
   to: PencilPoint,
   size: number,
-  grade: PencilGrade
+  grade: PencilGrade,
+  random: () => number = Math.random
 ) {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -113,7 +116,8 @@ export function drawPencilStroke(
           from.pressure + (to.pressure - from.pressure) * t,
       },
       size,
-      grade
+      grade,
+      random
     );
   }
 }

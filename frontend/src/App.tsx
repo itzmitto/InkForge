@@ -138,6 +138,39 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    function handleGridShortcut(event: KeyboardEvent) {
+      if (
+        event.key.toLowerCase() !== "g" ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target.closest("input, textarea, select, [contenteditable]"))
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      setShowGrid((current) => !current);
+    }
+
+    window.addEventListener("keydown", handleGridShortcut);
+
+    return () => {
+      window.removeEventListener("keydown", handleGridShortcut);
+    };
+  }, []);
+
   const selectedTool = tools.find((tool) => tool.id === activeTool)!;
 
   function addLayer() {

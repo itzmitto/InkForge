@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CanvasSurface from "./CanvasSurface";
 import {
   Brush, ChevronDown, CircleHelp, Eye, EyeOff,
   FilePlus2, Grid2X2, Hand, Layers3, LockKeyhole,
@@ -161,11 +162,10 @@ function App() {
               style={{ transform: `scale(${zoom / 100})` }}
             >
               {showGrid && <div className="paper-grid absolute inset-0" />}
-              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-[#9e9b93]">
-                <PenTool size={40} strokeWidth={1} className="mb-5 opacity-40" />
-                <p className="font-serif text-lg tracking-wide">Your canvas awaits</p>
-                <p className="mt-2 text-xs">Drawing engine coming in PR #3</p>
-              </div>
+              <CanvasSurface
+                enabled={activeTool === "pencil" || activeTool === "ink"}
+                brushSize={brushSize}
+              />
               <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.15em] text-[#b4b0a8]">
                 InkForge / Artboard 01
               </span>

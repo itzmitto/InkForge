@@ -9,7 +9,7 @@ import type {
   PencilPoint,
 } from "./brushes/pencil";
 
-type DrawingTool = "pencil" | "ink" | "none";
+type DrawingTool = "pencil" | "ink" | "eraser" | "none";
 
 type CanvasSurfaceProps = {
   tool: DrawingTool;
@@ -86,6 +86,45 @@ export default function CanvasSurface({
     context.stroke();
   }
 
+  function eraseDot(
+    context: CanvasRenderingContext2D,
+    point: PencilPoint
+  ) {
+    context.save();
+    context.globalCompositeOperation = "destination-out";
+    context.globalAlpha = 1;
+    context.fillStyle = "#000000";
+    context.beginPath();
+    context.arc(
+      point.x,
+      point.y,
+      Math.max(0.5, brushSize / 2),
+      0,
+      Math.PI * 2
+    );
+    context.fill();
+    context.restore();
+  }
+
+  function eraseLine(
+    context: CanvasRenderingContext2D,
+    from: PencilPoint,
+    to: PencilPoint
+  ) {
+    context.save();
+    context.globalCompositeOperation = "destination-out";
+    context.globalAlpha = 1;
+    context.strokeStyle = "#000000";
+    context.lineWidth = brushSize;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.beginPath();
+    context.moveTo(from.x, from.y);
+    context.lineTo(to.x, to.y);
+    context.stroke();
+    context.restore();
+  }
+
   function handlePointerDown(
     event: ReactPointerEvent<HTMLCanvasElement>
   ) {
@@ -103,6 +142,8 @@ export default function CanvasSurface({
 
     if (tool === "pencil") {
       drawPencilDot(context, point, brushSize, pencilGrade);
+    } else if (tool === "eraser") {
+      eraseDot(context, point);
     } else {
       drawInkDot(context, point);
     }
@@ -127,6 +168,8 @@ export default function CanvasSurface({
         brushSize,
         pencilGrade
       );
+    } else if (tool === "eraser") {
+      eraseLine(context, lastPoint.current, point);
     } else {
       drawInkLine(context, lastPoint.current, point);
     }

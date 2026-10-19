@@ -16,6 +16,7 @@ type Stroke = {
   tool: DrawingTool;
   size: number;
   grade: PencilGrade;
+  opacity: number;
   seed: number;
   points: PencilPoint[];
 };
@@ -29,6 +30,7 @@ type CanvasSurfaceProps = {
   tool: SelectedTool;
   brushSize: number;
   pencilGrade: PencilGrade;
+  brushOpacity: number;
   onHistoryChange?: (state: HistoryState) => void;
 };
 
@@ -63,7 +65,8 @@ function drawDot(
       point,
       stroke.size,
       stroke.grade,
-      random
+      random,
+      stroke.opacity
     );
     return;
   }
@@ -72,6 +75,8 @@ function drawDot(
 
   if (stroke.tool === "eraser") {
     context.globalCompositeOperation = "destination-out";
+  } else if (stroke.tool === "ink") {
+    context.globalAlpha = stroke.opacity;
   }
 
   context.fillStyle = "#292620";
@@ -95,7 +100,8 @@ function drawSegment(
       to,
       stroke.size,
       stroke.grade,
-      random
+      random,
+      stroke.opacity
     );
     return;
   }
@@ -104,6 +110,8 @@ function drawSegment(
 
   if (stroke.tool === "eraser") {
     context.globalCompositeOperation = "destination-out";
+  } else if (stroke.tool === "ink") {
+    context.globalAlpha = stroke.opacity;
   }
 
   context.strokeStyle = "#292620";
@@ -123,7 +131,7 @@ const CanvasSurface = forwardRef<
   CanvasSurfaceHandle,
   CanvasSurfaceProps
 >(function CanvasSurface(
-  { tool, brushSize, pencilGrade, onHistoryChange },
+  { tool, brushSize, pencilGrade, brushOpacity, onHistoryChange },
   ref
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -237,6 +245,7 @@ const CanvasSurface = forwardRef<
       tool,
       size: brushSize,
       grade: pencilGrade,
+      opacity: Math.max(0.01, Math.min(1, brushOpacity / 100)),
       seed,
       points: [point],
     };

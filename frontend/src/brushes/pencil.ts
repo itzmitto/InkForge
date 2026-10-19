@@ -28,7 +28,8 @@ function stamp(
   point: PencilPoint,
   size: number,
   grade: PencilGrade,
-  random: () => number
+  random: () => number,
+  opacity: number
 ) {
   const preset = presets[grade];
   const pressure = Math.max(0.1, Math.min(1, point.pressure));
@@ -40,7 +41,7 @@ function stamp(
   context.save();
   context.fillStyle = "#211f1c";
   context.globalAlpha =
-    preset.opacity * (0.4 + pressure * 0.6);
+    preset.opacity * (0.4 + pressure * 0.6) * opacity;
 
   context.beginPath();
   context.ellipse(
@@ -61,7 +62,7 @@ function stamp(
     const y = point.y + Math.sin(angle) * distance;
 
     context.globalAlpha =
-      preset.opacity * (0.15 + random() * 0.4);
+      preset.opacity * (0.15 + random() * 0.4) * opacity;
 
     context.beginPath();
     context.arc(
@@ -82,9 +83,10 @@ export function drawPencilDot(
   point: PencilPoint,
   size: number,
   grade: PencilGrade,
-  random: () => number = Math.random
+  random: () => number = Math.random,
+  opacity = 1
 ) {
-  stamp(context, point, size, grade, random);
+  stamp(context, point, size, grade, random, opacity);
 }
 
 export function drawPencilStroke(
@@ -93,7 +95,8 @@ export function drawPencilStroke(
   to: PencilPoint,
   size: number,
   grade: PencilGrade,
-  random: () => number = Math.random
+  random: () => number = Math.random,
+  opacity = 1
 ) {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -117,7 +120,8 @@ export function drawPencilStroke(
       },
       size,
       grade,
-      random
+      random,
+      opacity
     );
   }
 }

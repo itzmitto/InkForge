@@ -3,7 +3,7 @@ import CanvasSurface from "./CanvasSurface";
 import { PENCIL_GRADES } from "./brushes/pencil";
 import type { PencilGrade } from "./brushes/pencil";
 import {
-  Brush, ChevronDown, CircleHelp, Eye, EyeOff,
+  Eraser, ChevronDown, CircleHelp, Eye, EyeOff,
   FilePlus2, Grid2X2, Hand, Layers3, LockKeyhole,
   MousePointer2, PanelBottomClose,
   PanelBottomOpen, PenTool, Pencil, Plus,
@@ -29,7 +29,7 @@ const tools: {
   { id: "select", label: "Selection", shortcut: "V", icon: MousePointer2 },
   { id: "pencil", label: "Pencil", shortcut: "B", icon: Pencil },
   { id: "ink", label: "Ink Pen", shortcut: "I", icon: PenTool },
-  { id: "eraser", label: "Eraser", shortcut: "E", icon: Brush },
+  { id: "eraser", label: "Eraser", shortcut: "E", icon: Eraser },
   { id: "hand", label: "Hand", shortcut: "H", icon: Hand }
 ];
 
@@ -167,11 +167,11 @@ function App() {
               {showGrid && <div className="paper-grid absolute inset-0" />}
               <CanvasSurface
                 tool={
-                  activeTool === "pencil"
-                    ? "pencil"
-                    : activeTool === "ink"
-                      ? "ink"
-                      : "none"
+                  activeTool === "pencil" ||
+                  activeTool === "ink" ||
+                  activeTool === "eraser"
+                    ? activeTool
+                    : "none"
                 }
                 brushSize={brushSize}
                 pencilGrade={pencilGrade}

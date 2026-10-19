@@ -1,0 +1,23 @@
+# Exclude all languages
+* linguist-detectable=false
+
+# Swift only
+*.swift linguist-language=Swift linguist-detectable=true
+
+# Generated files
+/.build/** linguist-generated=true linguist-detectable=false
+/build/** linguist-generated=true linguist-detectable=false
+/DerivedData/** linguist-generated=true linguist-detectable=false
+/node_modules/** linguist-vendored linguist-detectable=false
+/dist/** linguist-generated=true linguist-detectable=false
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.a binary
+*.dylib binary

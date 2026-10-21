@@ -22,6 +22,39 @@ function parseRgb(hex: string): RGB | null {
   };
 }
 
+function getHsl(rgb: RGB): string {
+  const r = rgb.r / 255;
+  const g = rgb.g / 255;
+  const b = rgb.b / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const delta = max - min;
+
+  let hue = 0;
+  let saturation = 0;
+  const lightness = (max + min) / 2;
+
+  if (delta > 0) {
+    saturation = delta / (1 - Math.abs(2 * lightness - 1));
+
+    switch (max) {
+      case r:
+        hue = ((g - b) / delta) % 6;
+        break;
+      case g:
+        hue = (b - r) / delta + 2;
+        break;
+      default:
+        hue = (r - g) / delta + 4;
+    }
+
+    hue = (hue * 60 + 360) % 360;
+  }
+
+  return `${Math.round(hue)}°, ${Math.round(saturation * 100)}%, ${Math.round(lightness * 100)}%`;
+}
+
 export default function PixelColorDetails({
   hex,
 }: {
@@ -34,6 +67,10 @@ export default function PixelColorDetails({
     {
       label: "RGB",
       value: rgb ? `${rgb.r}, ${rgb.g}, ${rgb.b}` : "—",
+    },
+    {
+      label: "HSL",
+      value: rgb ? getHsl(rgb) : "—",
     },
   ];
 

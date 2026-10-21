@@ -5,7 +5,13 @@ type Position = {
   y: number;
 };
 
-export default function CanvasInspector() {
+type CanvasInspectorProps = {
+  zoom: number;
+};
+
+export default function CanvasInspector({
+  zoom,
+}: CanvasInspectorProps) {
   const [position, setPosition] = useState<Position | null>(null);
 
   useEffect(() => {
@@ -61,6 +67,9 @@ export default function CanvasInspector() {
       </span>
       <span>
         Y: {position?.y ?? "—"}
+      </span>
+      <span className="border-l border-white/20 pl-3">
+        Zoom: {zoom}%
       </span>
     </div>
   );

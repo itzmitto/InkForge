@@ -21,6 +21,18 @@ export default function CanvasInspector({
   pencilGrade,
 }: CanvasInspectorProps) {
   const [position, setPosition] = useState<Position | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  async function copyPixelColor() {
+    if (!position) return;
+
+    try {
+      await navigator.clipboard.writeText(position.hex);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   useEffect(() => {
     const canvas = document.querySelector<HTMLCanvasElement>(
@@ -77,6 +89,7 @@ export default function CanvasInspector({
         y: pixelY,
         hex,
       });
+      setCopied(false);
     }
 
     function handleLeave() {
@@ -121,6 +134,14 @@ export default function CanvasInspector({
         />
         {position?.hex ?? "—"}
       </span>
+      <button
+        type="button"
+        disabled={!position}
+        onClick={copyPixelColor}
+        className="pointer-events-auto rounded border border-white/20 px-2 py-1 text-[10px] hover:bg-white/10 disabled:opacity-40"
+      >
+        {copied ? "Copied" : "Copy HEX"}
+      </button>
     </div>
   );
 }

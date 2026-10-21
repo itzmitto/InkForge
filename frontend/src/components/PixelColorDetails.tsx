@@ -90,6 +90,16 @@ function getLuminance(rgb: RGB): string {
   return `${Math.round(luminance * 100)}%`;
 }
 
+function getInvertedHex(rgb: RGB): string {
+  return (
+    "#" +
+    [255 - rgb.r, 255 - rgb.g, 255 - rgb.b]
+      .map((value) => value.toString(16).padStart(2, "0"))
+      .join("")
+      .toUpperCase()
+  );
+}
+
 export default function PixelColorDetails({
   hex,
 }: {
@@ -114,6 +124,11 @@ export default function PixelColorDetails({
     {
       label: "Luminance",
       value: rgb ? getLuminance(rgb) : "—",
+    },
+    {
+      label: "Inverted",
+      value: rgb ? getInvertedHex(rgb) : "—",
+      swatch: rgb ? getInvertedHex(rgb) : undefined,
     },
   ];
 

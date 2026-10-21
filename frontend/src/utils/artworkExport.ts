@@ -1,3 +1,5 @@
+export type ArtworkFormat = "png" | "jpeg";
+
 function createArtworkCanvas(): HTMLCanvasElement {
   const source = document.querySelector<HTMLCanvasElement>(
     'canvas[aria-label="InkForge drawing canvas"]'
@@ -24,27 +26,36 @@ function createArtworkCanvas(): HTMLCanvasElement {
   return canvas;
 }
 
-export function createArtworkPng(): Promise<Blob> {
+export function createArtworkBlob(
+  format: ArtworkFormat = "png"
+): Promise<Blob> {
   const canvas = createArtworkCanvas();
+  const mimeType = format === "png" ? "image/png" : "image/jpeg";
 
   return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error("PNG export failed"));
-      }
-    }, "image/png");
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Artwork export failed"));
+        }
+      },
+      mimeType,
+      0.92
+    );
   });
 }
 
-export async function downloadArtwork(): Promise<void> {
-  const blob = await createArtworkPng();
+export async function downloadArtwork(
+  format: ArtworkFormat = "png"
+): Promise<void> {
+  const blob = await createArtworkBlob(format);
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
 
   link.href = url;
-  link.download = "inkforge-artwork.png";
+  link.download = `inkforge-artwork.${format === "jpeg" ? "jpg" : "png"}`;
 
   document.body.appendChild(link);
   link.click();

@@ -1,3 +1,4 @@
+import PixelColorDetails from "./PixelColorDetails";
 import { useEffect, useState } from "react";
 import type { PencilGrade } from "../brushes/pencil";
 
@@ -136,6 +137,7 @@ export default function CanvasInspector({
         {tool === "pencil" ? `Pencil ${pencilGrade}` : tool}
       </span>
       <span>{brushSize}px</span>
+      <PixelColorDetails hex={position?.hex ?? null} />
       <span className="flex items-center gap-2 border-l border-white/20 pl-3">
         <span
           className="h-3 w-3 rounded-sm border border-white/30"

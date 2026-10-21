@@ -22,6 +22,7 @@ export default function CanvasInspector({
 }: CanvasInspectorProps) {
   const [position, setPosition] = useState<Position | null>(null);
   const [copied, setCopied] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   async function copyPixelColor() {
     if (!position) return;
@@ -112,9 +113,19 @@ export default function CanvasInspector({
       aria-label="Canvas inspector"
       className="pointer-events-none absolute bottom-4 left-4 z-30 flex items-center gap-3 rounded-lg border border-white/10 bg-[#191a1f]/90 px-3 py-2 font-mono text-[11px] text-white shadow-lg"
     >
-      <span>
-        X: {position?.x ?? "—"}
-      </span>
+      <button
+        type="button"
+        onClick={() => setExpanded((current) => !current)}
+        aria-expanded={expanded}
+        className="pointer-events-auto rounded border border-white/20 px-2 py-1 text-[10px] hover:bg-white/10"
+      >
+        {expanded ? "Hide" : "Show"}
+      </button>
+      {expanded && (
+        <div className="flex items-center gap-3">
+          <span>
+            X: {position?.x ?? "—"}
+          </span>
       <span>
         Y: {position?.y ?? "—"}
       </span>
@@ -142,6 +153,8 @@ export default function CanvasInspector({
       >
         {copied ? "Copied" : "Copy HEX"}
       </button>
+        </div>
+      )}
     </div>
   );
 }

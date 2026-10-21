@@ -1,3 +1,4 @@
+import ArtworkActions from "./components/ArtworkActions";
 import BrushSizePresets from "./components/BrushSizePresets";
 import { useEffect, useRef, useState } from "react";
 import CanvasSurface from "./CanvasSurface";
@@ -303,6 +304,7 @@ function App() {
             </div>
           </div>
 
+          <ArtworkActions />
           <section className="workspace-grid relative min-h-0 flex-1 overflow-auto p-4">
             <div
               className="artboard relative aspect-[4/3] mx-auto w-[1100px] max-w-none overflow-hidden bg-[#f3f0e8] shadow-[0_20px_80px_#00000065]"

@@ -73,6 +73,23 @@ function getCmyk(rgb: RGB): string {
   return `${c}%, ${m}%, ${y}%, ${Math.round(k * 100)}%`;
 }
 
+function getLuminance(rgb: RGB): string {
+  const channels = [rgb.r, rgb.g, rgb.b].map((value) => {
+    const channel = value / 255;
+
+    return channel <= 0.04045
+      ? channel / 12.92
+      : ((channel + 0.055) / 1.055) ** 2.4;
+  });
+
+  const luminance =
+    channels[0] * 0.2126 +
+    channels[1] * 0.7152 +
+    channels[2] * 0.0722;
+
+  return `${Math.round(luminance * 100)}%`;
+}
+
 export default function PixelColorDetails({
   hex,
 }: {
@@ -93,6 +110,10 @@ export default function PixelColorDetails({
     {
       label: "CMYK",
       value: rgb ? getCmyk(rgb) : "—",
+    },
+    {
+      label: "Luminance",
+      value: rgb ? getLuminance(rgb) : "—",
     },
   ];
 

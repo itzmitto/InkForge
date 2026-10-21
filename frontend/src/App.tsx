@@ -326,7 +326,12 @@ function App() {
                 brushOpacity={brushOpacity}
                 pencilGrade={pencilGrade}
               />
-              <CanvasInspector zoom={zoom} />
+              <CanvasInspector
+                zoom={zoom}
+                tool={activeTool}
+                brushSize={brushSize}
+                pencilGrade={pencilGrade}
+              />
               <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.15em] text-[#b4b0a8]">
                 InkForge / Artboard 01
               </span>

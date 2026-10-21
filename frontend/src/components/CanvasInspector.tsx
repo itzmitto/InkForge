@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { PencilGrade } from "../brushes/pencil";
 
 type Position = {
   x: number;
@@ -7,10 +8,16 @@ type Position = {
 
 type CanvasInspectorProps = {
   zoom: number;
+  tool: "select" | "pencil" | "ink" | "eraser" | "hand";
+  brushSize: number;
+  pencilGrade: PencilGrade;
 };
 
 export default function CanvasInspector({
   zoom,
+  tool,
+  brushSize,
+  pencilGrade,
 }: CanvasInspectorProps) {
   const [position, setPosition] = useState<Position | null>(null);
 
@@ -71,6 +78,10 @@ export default function CanvasInspector({
       <span className="border-l border-white/20 pl-3">
         Zoom: {zoom}%
       </span>
+      <span className="border-l border-white/20 pl-3">
+        {tool === "pencil" ? `Pencil ${pencilGrade}` : tool}
+      </span>
+      <span>{brushSize}px</span>
     </div>
   );
 }

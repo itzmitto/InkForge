@@ -4,6 +4,7 @@ import type { PencilGrade } from "../brushes/pencil";
 type Position = {
   x: number;
   y: number;
+  hex: string;
 };
 
 type CanvasInspectorProps = {
@@ -43,9 +44,38 @@ export default function CanvasInspector({
         return;
       }
 
+      const pixelX = Math.min(
+        canvas.width - 1,
+        Math.floor(x * canvas.width)
+      );
+      const pixelY = Math.min(
+        canvas.height - 1,
+        Math.floor(y * canvas.height)
+      );
+
+      const data = canvas
+        .getContext("2d")
+        ?.getImageData(pixelX, pixelY, 1, 1).data;
+
+      const alpha = data ? data[3] / 255 : 0;
+
+      const background = [243, 240, 232];
+
+      const hex = `#${background
+        .map((value, index) => {
+          const channel = data
+            ? Math.round(data[index] * alpha + value * (1 - alpha))
+            : value;
+
+          return channel.toString(16).padStart(2, "0");
+        })
+        .join("")
+        .toUpperCase()}`;
+
       setPosition({
-        x: Math.min(canvas.width - 1, Math.floor(x * canvas.width)),
-        y: Math.min(canvas.height - 1, Math.floor(y * canvas.height)),
+        x: pixelX,
+        y: pixelY,
+        hex,
       });
     }
 
@@ -82,6 +112,15 @@ export default function CanvasInspector({
         {tool === "pencil" ? `Pencil ${pencilGrade}` : tool}
       </span>
       <span>{brushSize}px</span>
+      <span className="flex items-center gap-2 border-l border-white/20 pl-3">
+        <span
+          className="h-3 w-3 rounded-sm border border-white/30"
+          style={{
+            backgroundColor: position?.hex ?? "#f3f0e8",
+          }}
+        />
+        {position?.hex ?? "—"}
+      </span>
     </div>
   );
 }

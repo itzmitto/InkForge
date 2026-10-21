@@ -55,6 +55,24 @@ function getHsl(rgb: RGB): string {
   return `${Math.round(hue)}°, ${Math.round(saturation * 100)}%, ${Math.round(lightness * 100)}%`;
 }
 
+function getCmyk(rgb: RGB): string {
+  const r = rgb.r / 255;
+  const g = rgb.g / 255;
+  const b = rgb.b / 255;
+
+  const k = 1 - Math.max(r, g, b);
+
+  if (k === 1) {
+    return "0%, 0%, 0%, 100%";
+  }
+
+  const c = Math.round(((1 - r - k) / (1 - k)) * 100);
+  const m = Math.round(((1 - g - k) / (1 - k)) * 100);
+  const y = Math.round(((1 - b - k) / (1 - k)) * 100);
+
+  return `${c}%, ${m}%, ${y}%, ${Math.round(k * 100)}%`;
+}
+
 export default function PixelColorDetails({
   hex,
 }: {
@@ -71,6 +89,10 @@ export default function PixelColorDetails({
     {
       label: "HSL",
       value: rgb ? getHsl(rgb) : "—",
+    },
+    {
+      label: "CMYK",
+      value: rgb ? getCmyk(rgb) : "—",
     },
   ];
 

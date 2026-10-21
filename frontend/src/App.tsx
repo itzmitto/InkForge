@@ -1,3 +1,4 @@
+import CanvasInspector from "./components/CanvasInspector";
 import ArtworkActions from "./components/ArtworkActions";
 import BrushSizePresets from "./components/BrushSizePresets";
 import { useEffect, useRef, useState } from "react";
@@ -325,6 +326,7 @@ function App() {
                 brushOpacity={brushOpacity}
                 pencilGrade={pencilGrade}
               />
+              <CanvasInspector />
               <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.15em] text-[#b4b0a8]">
                 InkForge / Artboard 01
               </span>

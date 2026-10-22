@@ -111,7 +111,14 @@ export default function PracticeTimer() {
         </button>
         <button
           type="button"
-          onClick={() => setElapsed(0)}
+          onClick={() => {
+            if (
+              elapsed === 0 ||
+              window.confirm("Reset your drawing practice timer?")
+            ) {
+              setElapsed(0);
+            }
+          }}
           className="rounded-md border border-white/20 px-3 py-1.5 text-xs hover:bg-white/10"
         >
           Reset

@@ -11,7 +11,19 @@ function formatElapsed(seconds: number): string {
 }
 
 export default function PracticeTimer() {
-  const [elapsed, setElapsed] = useState(0);
+  const [elapsed, setElapsed] = useState(() => {
+    try {
+      const stored = Number(
+        window.localStorage.getItem("inkforge-practice-seconds")
+      );
+
+      return Number.isSafeInteger(stored) && stored >= 0
+        ? stored
+        : 0;
+    } catch {
+      return 0;
+    }
+  });
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
@@ -23,6 +35,17 @@ export default function PracticeTimer() {
 
     return () => window.clearInterval(interval);
   }, [paused]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "inkforge-practice-seconds",
+        String(elapsed)
+      );
+    } catch {
+      return;
+    }
+  }, [elapsed]);
 
   return (
     <aside

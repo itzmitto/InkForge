@@ -59,6 +59,35 @@ export default function PracticeSessions({
     0
   );
 
+  function exportSessions() {
+    if (sessions.length === 0) return;
+
+    const rows = [
+      "Date,Seconds",
+      ...sessions.map(
+        (session) =>
+          `${session.savedAt},${session.seconds}`
+      ),
+    ];
+
+    const blob = new Blob(
+      [rows.join("\r\n")],
+      { type: "text/csv;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "inkforge-drawing-sessions.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -101,6 +130,15 @@ export default function PracticeSessions({
         className="mt-2 rounded-md border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10 disabled:opacity-40"
       >
         Save Session
+      </button>
+
+      <button
+        type="button"
+        disabled={sessions.length === 0}
+        onClick={exportSessions}
+        className="ml-2 mt-2 rounded-md border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10 disabled:opacity-40"
+      >
+        Export CSV
       </button>
 
       <p className="mt-2 text-[11px] text-white/60">

@@ -11,6 +11,7 @@ function formatElapsed(seconds: number): string {
 }
 
 export default function PracticeTimer() {
+  const [compact, setCompact] = useState(false);
   const [elapsed, setElapsed] = useState(() => {
     try {
       const stored = Number(
@@ -101,6 +102,16 @@ export default function PracticeTimer() {
       <p className="mt-1 font-mono text-lg font-semibold">
         {formatElapsed(elapsed)}
       </p>
+      <button
+        type="button"
+        aria-expanded={!compact}
+        onClick={() => setCompact((current) => !current)}
+        className="mt-2 rounded border border-white/20 px-2 py-1 text-[11px] hover:bg-white/10"
+      >
+        {compact ? "Show controls" : "Hide controls"}
+      </button>
+      {!compact && (
+        <>
       <div className="mt-3 flex gap-2">
         <button
           type="button"
@@ -172,6 +183,8 @@ export default function PracticeTimer() {
               (goalMinutes * 60 - elapsed) / 60
             )} minutes remaining`}
       </p>
+        </>
+      )}
     </aside>
   );
 }

@@ -31,6 +31,16 @@ function readSessions(): PracticeSession[] {
   }
 }
 
+function formatDuration(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remaining = seconds % 60;
+
+  return [hours, minutes, remaining]
+    .map((value) => String(value).padStart(2, "0"))
+    .join(":");
+}
+
 export default function PracticeSessions({
   elapsed,
 }: {
@@ -86,6 +96,24 @@ export default function PracticeSessions({
       <p className="mt-2 text-[11px] text-white/60">
         Saved sessions: {sessions.length}
       </p>
+
+      {sessions.length > 0 && (
+        <ol className="mt-3 max-h-40 space-y-2 overflow-y-auto">
+          {sessions.slice(0, 5).map((session, index) => (
+            <li
+              key={`${session.savedAt}-${index}`}
+              className="flex justify-between gap-3 text-[11px] text-white/70"
+            >
+              <span>
+                {new Date(session.savedAt).toLocaleDateString()}
+              </span>
+              <span className="font-mono">
+                {formatDuration(session.seconds)}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
 
       {error && (
         <p role="alert" className="mt-2 text-xs text-red-300">

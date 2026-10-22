@@ -1,3 +1,4 @@
+import PracticeSessions from "./PracticeSessions";
 import { useEffect, useState } from "react";
 
 function formatElapsed(seconds: number): string {
@@ -185,6 +186,7 @@ export default function PracticeTimer() {
       </p>
         </>
       )}
+      <PracticeSessions elapsed={elapsed} />
     </aside>
   );
 }

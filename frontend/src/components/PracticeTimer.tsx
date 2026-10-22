@@ -12,16 +12,17 @@ function formatElapsed(seconds: number): string {
 
 export default function PracticeTimer() {
   const [elapsed, setElapsed] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
-      if (document.visibilityState === "visible") {
+      if (document.visibilityState === "visible" && !paused) {
         setElapsed((current) => current + 1);
       }
     }, 1000);
 
     return () => window.clearInterval(interval);
-  }, []);
+  }, [paused]);
 
   return (
     <aside
@@ -34,6 +35,15 @@ export default function PracticeTimer() {
       <p className="mt-1 font-mono text-lg font-semibold">
         {formatElapsed(elapsed)}
       </p>
+      <div className="mt-3 flex gap-2">
+        <button
+          type="button"
+          onClick={() => setPaused((current) => !current)}
+          className="rounded-md border border-white/20 px-3 py-1.5 text-xs hover:bg-white/10"
+        >
+          {paused ? "Resume" : "Pause"}
+        </button>
+      </div>
     </aside>
   );
 }

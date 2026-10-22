@@ -49,6 +49,11 @@ export default function PracticeSessions({
   const [sessions, setSessions] = useState(readSessions);
   const [error, setError] = useState("");
 
+  const totalSeconds = sessions.reduce(
+    (total, session) => total + session.seconds,
+    0
+  );
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -95,6 +100,10 @@ export default function PracticeSessions({
 
       <p className="mt-2 text-[11px] text-white/60">
         Saved sessions: {sessions.length}
+      </p>
+
+      <p className="mt-2 text-[11px] text-white/70">
+        Total practice: {formatDuration(totalSeconds)}
       </p>
 
       {sessions.length > 0 && (

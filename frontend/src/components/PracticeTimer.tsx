@@ -25,7 +25,18 @@ export default function PracticeTimer() {
     }
   });
   const [paused, setPaused] = useState(false);
-  const [goalMinutes, setGoalMinutes] = useState(25);
+  const [goalMinutes, setGoalMinutes] = useState(() => {
+    try {
+      const stored = Number(
+        window.localStorage.getItem("inkforge-practice-goal")
+      );
+      return [10, 15, 25, 45, 60].includes(stored)
+        ? stored
+        : 25;
+    } catch {
+      return 25;
+    }
+  });
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -47,6 +58,17 @@ export default function PracticeTimer() {
       return;
     }
   }, [elapsed]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "inkforge-practice-goal",
+        String(goalMinutes)
+      );
+    } catch {
+      return;
+    }
+  }, [goalMinutes]);
 
   return (
     <aside

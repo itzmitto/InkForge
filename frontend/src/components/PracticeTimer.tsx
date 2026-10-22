@@ -25,6 +25,7 @@ export default function PracticeTimer() {
     }
   });
   const [paused, setPaused] = useState(false);
+  const [goalMinutes, setGoalMinutes] = useState(25);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -74,6 +75,47 @@ export default function PracticeTimer() {
           Reset
         </button>
       </div>
+      <label className="mt-3 flex items-center justify-between gap-3 text-xs text-white/70">
+        Practice goal
+        <select
+          value={goalMinutes}
+          onChange={(event) =>
+            setGoalMinutes(Number(event.target.value))
+          }
+          className="rounded border border-white/20 bg-[#292a30] px-2 py-1 text-white"
+        >
+          <option value={10}>10 min</option>
+          <option value={15}>15 min</option>
+          <option value={25}>25 min</option>
+          <option value={45}>45 min</option>
+          <option value={60}>60 min</option>
+        </select>
+      </label>
+      <div
+        role="progressbar"
+        aria-label="Drawing practice progress"
+        aria-valuemin={0}
+        aria-valuemax={goalMinutes * 60}
+        aria-valuenow={Math.min(elapsed, goalMinutes * 60)}
+        className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/15"
+      >
+        <div
+          className="h-full rounded-full bg-[#cba879]"
+          style={{
+            width: `${Math.min(
+              100,
+              (elapsed / (goalMinutes * 60)) * 100
+            )}%`,
+          }}
+        />
+      </div>
+      <p className="mt-2 text-[11px] text-white/60">
+        {elapsed >= goalMinutes * 60
+          ? "Practice goal reached!"
+          : `${Math.ceil(
+              (goalMinutes * 60 - elapsed) / 60
+            )} minutes remaining`}
+      </p>
     </aside>
   );
 }

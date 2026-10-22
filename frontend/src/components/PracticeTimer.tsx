@@ -43,6 +43,13 @@ export default function PracticeTimer() {
         >
           {paused ? "Resume" : "Pause"}
         </button>
+        <button
+          type="button"
+          onClick={() => setElapsed(0)}
+          className="rounded-md border border-white/20 px-3 py-1.5 text-xs hover:bg-white/10"
+        >
+          Reset
+        </button>
       </div>
     </aside>
   );

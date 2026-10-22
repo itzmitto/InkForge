@@ -1,3 +1,4 @@
+import PracticeTimer from "./components/PracticeTimer";
 import CanvasInspector from "./components/CanvasInspector";
 import ArtworkActions from "./components/ArtworkActions";
 import BrushSizePresets from "./components/BrushSizePresets";
@@ -326,6 +327,7 @@ function App() {
                 brushOpacity={brushOpacity}
                 pencilGrade={pencilGrade}
               />
+              <PracticeTimer />
               <CanvasInspector
                 zoom={zoom}
                 tool={activeTool}

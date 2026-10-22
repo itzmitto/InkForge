@@ -140,6 +140,13 @@ export default function PracticeTimer() {
           <option value={60}>60 min</option>
         </select>
       </label>
+      <p className="mt-3 text-[11px] text-white/70">
+        Goal progress:{" "}
+        {Math.min(
+          100,
+          Math.floor((elapsed / (goalMinutes * 60)) * 100)
+        )}%
+      </p>
       <div
         role="progressbar"
         aria-label="Drawing practice progress"

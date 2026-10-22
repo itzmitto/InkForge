@@ -54,6 +54,11 @@ export default function PracticeSessions({
     0
   );
 
+  const longestSession = sessions.reduce(
+    (longest, session) => Math.max(longest, session.seconds),
+    0
+  );
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -104,6 +109,10 @@ export default function PracticeSessions({
 
       <p className="mt-2 text-[11px] text-white/70">
         Total practice: {formatDuration(totalSeconds)}
+      </p>
+
+      <p className="mt-2 text-[11px] text-white/70">
+        Personal best: {formatDuration(longestSession)}
       </p>
 
       {sessions.length > 0 && (

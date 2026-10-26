@@ -1,3 +1,4 @@
+import BreakReminder from "./components/BreakReminder";
 import PracticeTimer from "./components/PracticeTimer";
 import CanvasInspector from "./components/CanvasInspector";
 import ArtworkActions from "./components/ArtworkActions";
@@ -328,6 +329,7 @@ function App() {
                 pencilGrade={pencilGrade}
               />
               <PracticeTimer />
+              <BreakReminder />
               <CanvasInspector
                 zoom={zoom}
                 tool={activeTool}

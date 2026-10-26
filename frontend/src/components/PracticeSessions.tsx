@@ -140,6 +140,11 @@ export default function PracticeSessions({
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  const averageSeconds =
+    sessions.length > 0
+      ? Math.round(totalSeconds / sessions.length)
+      : 0;
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -217,6 +222,10 @@ export default function PracticeSessions({
 
       <p className="mt-2 text-[11px] text-white/70">
         Total practice: {formatDuration(totalSeconds)}
+      </p>
+
+      <p className="mt-2 text-[11px] text-white/70">
+        Average session: {formatDuration(averageSeconds)}
       </p>
 
       <p className="mt-2 text-[11px] text-white/70">

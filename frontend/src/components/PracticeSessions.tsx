@@ -170,6 +170,11 @@ export default function PracticeSessions({
     0
   );
 
+  const shortestSession = sessions.reduce(
+    (shortest, session) => Math.min(shortest, session.seconds),
+    Infinity
+  );
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -267,6 +272,12 @@ export default function PracticeSessions({
 
       <p className="mt-2 text-[11px] text-white/70">
         Personal best: {formatDuration(longestSession)}
+      </p>
+
+      <p className="mt-2 text-[11px] text-white/70">
+        Shortest session: {formatDuration(
+          Number.isFinite(shortestSession) ? shortestSession : 0
+        )}
       </p>
 
       {sessions.length > 0 && (

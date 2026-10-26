@@ -15,13 +15,20 @@ const PROMPTS = [
   { text: "Illustrate a gothic castle above a stormy sea", category: "Environments", difficulty: "Hard" },
 ] as const;
 
+type PromptCategory = "All" | (typeof PROMPTS)[number]["category"];
 
 export default function DrawingPrompts() {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+  const [category, setCategory] = useState<PromptCategory>("All");
 
-  const visiblePrompts = PROMPTS;
-  const selectedPrompt = PROMPTS[index % PROMPTS.length];
+  const visiblePrompts = PROMPTS.filter(
+    (prompt) =>
+      (category === "All" || prompt.category === category)
+  );
+
+  const selectedPrompt =
+    visiblePrompts[index % visiblePrompts.length] ?? PROMPTS[0];
 
   function nextPrompt() {
     setIndex((current) => (current + 1) % visiblePrompts.length);
@@ -46,6 +53,24 @@ export default function DrawingPrompts() {
           <p className="text-[11px] uppercase tracking-wider text-[#cba879]">
             Sketch Inspiration
           </p>
+
+          <label className="mt-3 block text-xs text-white/70">
+            Category
+            <select
+              value={category}
+              onChange={(event) => {
+                setCategory(event.target.value as PromptCategory);
+                setIndex(0);
+              }}
+              className="mt-1 w-full rounded border border-white/20 bg-[#292a30] px-2 py-2 text-white"
+            >
+              <option value="All">All Categories</option>
+              <option value="Anatomy">Anatomy</option>
+              <option value="Fantasy">Fantasy</option>
+              <option value="Creatures">Creatures</option>
+              <option value="Environments">Environments</option>
+            </select>
+          </label>
 
           <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
             <p className="text-sm leading-relaxed">

@@ -37,6 +37,17 @@ export default function DrawingPrompts() {
     setIndex((current) => (current + 1) % visiblePrompts.length);
   }
 
+  function surpriseMe() {
+    setIndex((current) => {
+      if (visiblePrompts.length <= 1) return current;
+
+      const offset =
+        1 + Math.floor(Math.random() * (visiblePrompts.length - 1));
+
+      return (current + offset) % visiblePrompts.length;
+    });
+  }
+
   return (
     <aside
       aria-label="Drawing prompt generator"
@@ -107,6 +118,14 @@ export default function DrawingPrompts() {
             className="mt-3 w-full rounded-lg bg-[#cba879] px-3 py-2 text-xs font-semibold text-[#191a1f] hover:opacity-90"
           >
             Next Prompt
+          </button>
+
+          <button
+            type="button"
+            onClick={surpriseMe}
+            className="mt-2 w-full rounded-lg border border-white/20 px-3 py-2 text-xs hover:bg-white/10"
+          >
+            Surprise Me
           </button>
         </div>
       )}

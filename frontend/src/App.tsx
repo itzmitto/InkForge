@@ -1,3 +1,4 @@
+import DrawingPrompts from "./components/DrawingPrompts";
 import BreakReminder from "./components/BreakReminder";
 import PracticeTimer from "./components/PracticeTimer";
 import CanvasInspector from "./components/CanvasInspector";
@@ -330,6 +331,7 @@ function App() {
               />
               <PracticeTimer />
               <BreakReminder />
+              <DrawingPrompts />
               <CanvasInspector
                 zoom={zoom}
                 tool={activeTool}

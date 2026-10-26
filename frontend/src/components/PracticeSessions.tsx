@@ -51,6 +51,7 @@ export default function PracticeSessions({
     () => Date.now() - 30 * 24 * 60 * 60 * 1000
   );
   const [error, setError] = useState("");
+  const [showAllSessions, setShowAllSessions] = useState(false);
 
   const totalSeconds = sessions.reduce(
     (total, session) => total + session.seconds,
@@ -280,9 +281,22 @@ export default function PracticeSessions({
         )}
       </p>
 
+      {sessions.length > 5 && (
+        <button
+          type="button"
+          onClick={() => setShowAllSessions((current) => !current)}
+          aria-expanded={showAllSessions}
+          className="mt-3 rounded-md border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10"
+        >
+          {showAllSessions ? "Show Recent" : "Show All Sessions"}
+        </button>
+      )}
+
       {sessions.length > 0 && (
         <ol className="mt-3 max-h-40 space-y-2 overflow-y-auto">
-          {sessions.slice(0, 5).map((session, index) => (
+          {sessions
+            .slice(0, showAllSessions ? sessions.length : 5)
+            .map((session, index) => (
             <li
               key={`${session.savedAt}-${index}`}
               className="flex justify-between gap-3 text-[11px] text-white/70"

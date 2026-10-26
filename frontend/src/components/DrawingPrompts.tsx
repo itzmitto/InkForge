@@ -23,6 +23,7 @@ export default function DrawingPrompts() {
   const [index, setIndex] = useState(0);
   const [category, setCategory] = useState<PromptCategory>("All");
   const [difficulty, setDifficulty] = useState<PromptDifficulty>("All");
+  const [copied, setCopied] = useState(false);
 
   const visiblePrompts = PROMPTS.filter(
     (prompt) =>
@@ -35,6 +36,7 @@ export default function DrawingPrompts() {
 
   function nextPrompt() {
     setIndex((current) => (current + 1) % visiblePrompts.length);
+    setCopied(false);
   }
 
   function surpriseMe() {
@@ -46,6 +48,16 @@ export default function DrawingPrompts() {
 
       return (current + offset) % visiblePrompts.length;
     });
+    setCopied(false);
+  }
+
+  async function copyPrompt() {
+    try {
+      await navigator.clipboard.writeText(selectedPrompt.text);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
   }
 
   return (
@@ -75,6 +87,7 @@ export default function DrawingPrompts() {
               onChange={(event) => {
                 setCategory(event.target.value as PromptCategory);
                 setIndex(0);
+                setCopied(false);
               }}
               className="mt-1 w-full rounded border border-white/20 bg-[#292a30] px-2 py-2 text-white"
             >
@@ -93,6 +106,7 @@ export default function DrawingPrompts() {
               onChange={(event) => {
                 setDifficulty(event.target.value as PromptDifficulty);
                 setIndex(0);
+                setCopied(false);
               }}
               className="mt-1 w-full rounded border border-white/20 bg-[#292a30] px-2 py-2 text-white"
             >
@@ -126,6 +140,14 @@ export default function DrawingPrompts() {
             className="mt-2 w-full rounded-lg border border-white/20 px-3 py-2 text-xs hover:bg-white/10"
           >
             Surprise Me
+          </button>
+
+          <button
+            type="button"
+            onClick={copyPrompt}
+            className="mt-2 w-full rounded-lg border border-white/20 px-3 py-2 text-xs hover:bg-white/10"
+          >
+            {copied ? "Copied!" : "Copy Prompt"}
           </button>
         </div>
       )}

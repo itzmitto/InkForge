@@ -47,6 +47,9 @@ export default function PracticeSessions({
   elapsed: number;
 }) {
   const [sessions, setSessions] = useState(readSessions);
+  const [monthStart] = useState(
+    () => Date.now() - 30 * 24 * 60 * 60 * 1000
+  );
   const [error, setError] = useState("");
 
   const totalSeconds = sessions.reduce(
@@ -159,6 +162,14 @@ export default function PracticeSessions({
     0
   );
 
+  const monthlySeconds = sessions.reduce(
+    (total, session) =>
+      Date.parse(session.savedAt) >= monthStart
+        ? total + session.seconds
+        : total,
+    0
+  );
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -248,6 +259,10 @@ export default function PracticeSessions({
 
       <p className="mt-2 text-[11px] text-white/70">
         Practice in last 7 days: {formatDuration(weeklySeconds)}
+      </p>
+
+      <p className="mt-2 text-[11px] text-white/70">
+        Practice in last 30 days: {formatDuration(monthlySeconds)}
       </p>
 
       <p className="mt-2 text-[11px] text-white/70">

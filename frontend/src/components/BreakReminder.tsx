@@ -3,8 +3,27 @@ import { useEffect, useState } from "react";
 export default function BreakReminder() {
   const [elapsed, setElapsed] = useState(0);
   const [snoozeRemaining, setSnoozeRemaining] = useState(0);
-  const [enabled, setEnabled] = useState(true);
-  const [breakMinutes, setBreakMinutes] = useState(20);
+  const [enabled, setEnabled] = useState(() => {
+    try {
+      return (
+        window.localStorage.getItem("inkforge-break-enabled") !== "false"
+      );
+    } catch {
+      return true;
+    }
+  });
+  const [breakMinutes, setBreakMinutes] = useState(() => {
+    try {
+      const stored = Number(
+        window.localStorage.getItem("inkforge-break-minutes")
+      );
+      return [5, 10, 20, 30, 45, 60].includes(stored)
+        ? stored
+        : 20;
+    } catch {
+      return 20;
+    }
+  });
 
   const remaining =
     Math.max(0, breakMinutes * 60 - elapsed) + snoozeRemaining;
@@ -21,6 +40,21 @@ export default function BreakReminder() {
     }, 1000);
 
     return () => window.clearInterval(interval);
+  }, [enabled, breakMinutes]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "inkforge-break-enabled",
+        String(enabled)
+      );
+      window.localStorage.setItem(
+        "inkforge-break-minutes",
+        String(breakMinutes)
+      );
+    } catch {
+      return;
+    }
   }, [enabled, breakMinutes]);
 
   return (

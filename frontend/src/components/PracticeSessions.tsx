@@ -103,6 +103,22 @@ export default function PracticeSessions({
     }
   }
 
+  function clearSessions() {
+    if (sessions.length === 0) return;
+
+    if (!window.confirm("Delete all saved drawing sessions?")) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(STORAGE_KEY, "[]");
+      setSessions([]);
+      setError("");
+    } catch {
+      setError("Unable to clear sessions.");
+    }
+  }
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -154,6 +170,15 @@ export default function PracticeSessions({
         className="ml-2 mt-2 rounded-md border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10 disabled:opacity-40"
       >
         Export CSV
+      </button>
+
+      <button
+        type="button"
+        disabled={sessions.length === 0}
+        onClick={clearSessions}
+        className="ml-2 mt-2 rounded-md border border-red-400/25 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10 disabled:opacity-40"
+      >
+        Clear History
       </button>
 
       <p className="mt-2 text-[11px] text-white/60">

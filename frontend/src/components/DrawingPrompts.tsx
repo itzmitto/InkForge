@@ -16,15 +16,18 @@ const PROMPTS = [
 ] as const;
 
 type PromptCategory = "All" | (typeof PROMPTS)[number]["category"];
+type PromptDifficulty = "All" | (typeof PROMPTS)[number]["difficulty"];
 
 export default function DrawingPrompts() {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [category, setCategory] = useState<PromptCategory>("All");
+  const [difficulty, setDifficulty] = useState<PromptDifficulty>("All");
 
   const visiblePrompts = PROMPTS.filter(
     (prompt) =>
-      (category === "All" || prompt.category === category)
+      (category === "All" || prompt.category === category) &&
+      (difficulty === "All" || prompt.difficulty === difficulty)
   );
 
   const selectedPrompt =
@@ -69,6 +72,23 @@ export default function DrawingPrompts() {
               <option value="Fantasy">Fantasy</option>
               <option value="Creatures">Creatures</option>
               <option value="Environments">Environments</option>
+            </select>
+          </label>
+
+          <label className="mt-3 block text-xs text-white/70">
+            Difficulty
+            <select
+              value={difficulty}
+              onChange={(event) => {
+                setDifficulty(event.target.value as PromptDifficulty);
+                setIndex(0);
+              }}
+              className="mt-1 w-full rounded border border-white/20 bg-[#292a30] px-2 py-2 text-white"
+            >
+              <option value="All">All Difficulties</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
             </select>
           </label>
 

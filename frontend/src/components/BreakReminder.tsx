@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 
 export default function BreakReminder() {
   const [elapsed, setElapsed] = useState(0);
+  const [snoozeRemaining, setSnoozeRemaining] = useState(0);
   const [enabled, setEnabled] = useState(true);
   const [breakMinutes, setBreakMinutes] = useState(20);
 
-  const remaining = Math.max(0, breakMinutes * 60 - elapsed);
+  const remaining =
+    Math.max(0, breakMinutes * 60 - elapsed) + snoozeRemaining;
   const due = enabled && remaining === 0;
 
   useEffect(() => {
@@ -14,6 +16,7 @@ export default function BreakReminder() {
         setElapsed((current) =>
           Math.min(current + 1, breakMinutes * 60)
         );
+        setSnoozeRemaining((current) => Math.max(0, current - 1));
       }
     }, 1000);
 
@@ -41,6 +44,7 @@ export default function BreakReminder() {
           onChange={(event) => {
             setBreakMinutes(Number(event.target.value));
             setElapsed(0);
+            setSnoozeRemaining(0);
           }}
           className="rounded border border-white/20 bg-[#292a30] px-2 py-1 text-white"
         >
@@ -60,13 +64,25 @@ export default function BreakReminder() {
             : `${Math.ceil(remaining / 60)} minutes until break`}
       </p>
       {due && (
-        <button
-          type="button"
-          onClick={() => setElapsed(0)}
-          className="mt-3 rounded border border-white/20 px-3 py-1.5 text-xs hover:bg-white/10"
-        >
-          Start Next Cycle
-        </button>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setElapsed(0);
+              setSnoozeRemaining(0);
+            }}
+            className="rounded border border-white/20 px-3 py-1.5 text-xs hover:bg-white/10"
+          >
+            Start Next Cycle
+          </button>
+          <button
+            type="button"
+            onClick={() => setSnoozeRemaining(300)}
+            className="rounded border border-white/20 px-3 py-1.5 text-xs hover:bg-white/10"
+          >
+            Snooze 5 Minutes
+          </button>
+        </div>
       )}
     </aside>
   );

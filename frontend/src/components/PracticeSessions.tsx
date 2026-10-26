@@ -145,6 +145,12 @@ export default function PracticeSessions({
       ? Math.round(totalSeconds / sessions.length)
       : 0;
 
+  const [weekStart] = useState(() => Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const weeklySessions = sessions.filter(
+    (session) => Date.parse(session.savedAt) >= weekStart
+  ).length;
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -226,6 +232,10 @@ export default function PracticeSessions({
 
       <p className="mt-2 text-[11px] text-white/70">
         Average session: {formatDuration(averageSeconds)}
+      </p>
+
+      <p className="mt-2 text-[11px] text-white/70">
+        Sessions in last 7 days: {weeklySessions}
       </p>
 
       <p className="mt-2 text-[11px] text-white/70">

@@ -88,6 +88,21 @@ export default function PracticeSessions({
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
   }
 
+  function deleteSession(index: number) {
+    const next = sessions.filter((_, current) => current !== index);
+
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(next)
+      );
+      setSessions(next);
+      setError("");
+    } catch {
+      setError("Unable to delete session.");
+    }
+  }
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -166,6 +181,14 @@ export default function PracticeSessions({
               <span className="font-mono">
                 {formatDuration(session.seconds)}
               </span>
+              <button
+                type="button"
+                onClick={() => deleteSession(index)}
+                aria-label={`Delete session from ${new Date(session.savedAt).toLocaleDateString()}`}
+                className="rounded border border-white/15 px-2 py-1 text-[10px] text-white/70 hover:bg-red-500/15 hover:text-red-300"
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ol>

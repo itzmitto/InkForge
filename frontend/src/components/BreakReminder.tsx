@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export default function BreakReminder() {
   const [elapsed, setElapsed] = useState(0);
   const [enabled, setEnabled] = useState(true);
-  const breakMinutes = 20;
+  const [breakMinutes, setBreakMinutes] = useState(20);
 
   const remaining = Math.max(0, breakMinutes * 60 - elapsed);
   const due = enabled && remaining === 0;
@@ -18,7 +18,7 @@ export default function BreakReminder() {
     }, 1000);
 
     return () => window.clearInterval(interval);
-  }, [enabled]);
+  }, [enabled, breakMinutes]);
 
   return (
     <aside
@@ -34,6 +34,24 @@ export default function BreakReminder() {
       >
         {enabled ? "Disable" : "Enable"}
       </button>
+      <label className="mt-3 flex items-center justify-between gap-2 text-xs text-white/70">
+        Interval
+        <select
+          value={breakMinutes}
+          onChange={(event) => {
+            setBreakMinutes(Number(event.target.value));
+            setElapsed(0);
+          }}
+          className="rounded border border-white/20 bg-[#292a30] px-2 py-1 text-white"
+        >
+          <option value={5}>5 min</option>
+          <option value={10}>10 min</option>
+          <option value={20}>20 min</option>
+          <option value={30}>30 min</option>
+          <option value={45}>45 min</option>
+          <option value={60}>60 min</option>
+        </select>
+      </label>
       <p aria-live="polite" className="mt-2 text-xs text-white/70">
         {!enabled
           ? "Reminders disabled"

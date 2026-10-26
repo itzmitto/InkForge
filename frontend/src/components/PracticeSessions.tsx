@@ -151,6 +151,14 @@ export default function PracticeSessions({
     (session) => Date.parse(session.savedAt) >= weekStart
   ).length;
 
+  const weeklySeconds = sessions.reduce(
+    (total, session) =>
+      Date.parse(session.savedAt) >= weekStart
+        ? total + session.seconds
+        : total,
+    0
+  );
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -236,6 +244,10 @@ export default function PracticeSessions({
 
       <p className="mt-2 text-[11px] text-white/70">
         Sessions in last 7 days: {weeklySessions}
+      </p>
+
+      <p className="mt-2 text-[11px] text-white/70">
+        Practice in last 7 days: {formatDuration(weeklySeconds)}
       </p>
 
       <p className="mt-2 text-[11px] text-white/70">

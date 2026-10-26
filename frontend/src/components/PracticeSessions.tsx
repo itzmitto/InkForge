@@ -119,6 +119,27 @@ export default function PracticeSessions({
     }
   }
 
+  function exportSessionsJson() {
+    if (sessions.length === 0) return;
+
+    const blob = new Blob(
+      [JSON.stringify(sessions, null, 2)],
+      { type: "application/json;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "inkforge-drawing-sessions.json";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   function saveSession() {
     if (!Number.isSafeInteger(elapsed) || elapsed <= 0) {
       return;
@@ -170,6 +191,15 @@ export default function PracticeSessions({
         className="ml-2 mt-2 rounded-md border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10 disabled:opacity-40"
       >
         Export CSV
+      </button>
+
+      <button
+        type="button"
+        disabled={sessions.length === 0}
+        onClick={exportSessionsJson}
+        className="ml-2 mt-2 rounded-md border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10 disabled:opacity-40"
+      >
+        Export JSON
       </button>
 
       <button

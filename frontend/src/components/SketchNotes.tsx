@@ -3,6 +3,7 @@ import type { ChangeEvent } from "react";
 
 export default function SketchNotes() {
   const [copied, setCopied] = useState(false);
+  const [fontSize, setFontSize] = useState(16);
   const [notes, setNotes] = useState(() => {
     try {
       return window.localStorage.getItem("inkforge-sketch-notes") ?? "";
@@ -88,6 +89,7 @@ export default function SketchNotes() {
         <textarea
           aria-label="Drawing notes"
           rows={6}
+          style={{ fontSize }}
           value={notes}
           onChange={(event) => { setNotes(event.target.value); setCopied(false); }}
           placeholder="Ideas, poses, lighting, references..."
@@ -120,6 +122,9 @@ export default function SketchNotes() {
           </button>
         </div>
         <div data-sketch-notes-settings="true" className="mt-3 flex flex-wrap gap-2">
+          <button type="button" aria-label="Decrease note font size" disabled={fontSize <= 12} onClick={() => setFontSize((size) => Math.max(12, size - 2))} className="rounded border border-white/20 px-2 py-1 text-xs disabled:opacity-40">A−</button>
+          <span className="self-center text-xs text-white/70">{fontSize}px</span>
+          <button type="button" aria-label="Increase note font size" disabled={fontSize >= 24} onClick={() => setFontSize((size) => Math.min(24, size + 2))} className="rounded border border-white/20 px-2 py-1 text-xs disabled:opacity-40">A+</button>
         </div>
       </div>
     </section>

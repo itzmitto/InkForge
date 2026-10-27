@@ -1,7 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function SketchNotes() {
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState(() => {
+    try {
+      return window.localStorage.getItem("inkforge-sketch-notes") ?? "";
+    } catch {
+      return "";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("inkforge-sketch-notes", notes);
+    } catch {
+      return;
+    }
+  }, [notes]);
 
   return (
     <section aria-label="Sketch notes" className="fixed left-5 top-24 z-40 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-white/15 bg-[#191a1f]/95 p-3 text-white shadow-xl">

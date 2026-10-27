@@ -32,6 +32,7 @@ export default function SketchNotes() {
           className="w-full resize-y rounded-lg border border-white/15 bg-[#292a30] p-3 text-sm text-white outline-none focus:border-[#cba879]"
         />
         <div data-sketch-notes-stats="true" className="mt-2 flex flex-wrap gap-3 text-[11px] text-white/60">
+          <span>Words: {notes.trim() ? notes.trim().split(/\s+/).length : 0}</span>
         </div>
         <div data-sketch-notes-actions="true" className="mt-3 flex flex-wrap gap-2">
         </div>

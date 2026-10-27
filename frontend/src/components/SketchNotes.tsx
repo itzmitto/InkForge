@@ -73,6 +73,12 @@ export default function SketchNotes() {
     setCopied(false);
   }
 
+  function insertPlanningTemplate() {
+    const template = "Subject:\nPose:\nLighting:\nMaterials:\nNext steps:\n";
+    setNotes((current) => `${current}${current && !current.endsWith("\n") ? "\n" : ""}${template}`);
+    setCopied(false);
+  }
+
   return (
     <section aria-label="Sketch notes" className="fixed left-5 top-24 z-40 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-white/15 bg-[#191a1f]/95 p-3 text-white shadow-xl">
       <header className="flex items-center justify-between gap-2">
@@ -93,6 +99,9 @@ export default function SketchNotes() {
           <span>Lines: {notes ? notes.split(/\r?\n/).length : 0}</span>
         </div>
         <div data-sketch-notes-actions="true" className="mt-3 flex flex-wrap gap-2">
+          <button type="button" onClick={insertPlanningTemplate} className="rounded border border-white/20 px-2 py-1.5 text-xs hover:bg-white/10">
+            Sketch Template
+          </button>
           <button type="button" onClick={insertTimestamp} className="rounded border border-white/20 px-2 py-1.5 text-xs hover:bg-white/10">
             Insert Date
           </button>

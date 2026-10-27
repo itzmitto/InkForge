@@ -3,6 +3,7 @@ import type { ChangeEvent } from "react";
 
 export default function SketchNotes() {
   const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState(false);
   const [fontSize, setFontSize] = useState(() => {
     try {
       const value = Number(window.localStorage.getItem("inkforge-notes-font-size"));
@@ -99,7 +100,11 @@ export default function SketchNotes() {
     <section aria-label="Sketch notes" className="fixed left-5 top-24 z-40 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-white/15 bg-[#191a1f]/95 p-3 text-white shadow-xl">
       <header className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold">Sketch Notes</h2>
+        <button type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)} className="rounded border border-white/20 px-2 py-1 text-xs hover:bg-white/10">
+          {open ? "Hide" : "Show"}
+        </button>
       </header>
+      {open && (
       <div data-sketch-notes-body="true" className="mt-3">
         <textarea
           aria-label="Drawing notes"
@@ -142,6 +147,7 @@ export default function SketchNotes() {
           <button type="button" aria-label="Increase note font size" disabled={fontSize >= 24} onClick={() => setFontSize((size) => Math.min(24, size + 2))} className="rounded border border-white/20 px-2 py-1 text-xs disabled:opacity-40">A+</button>
         </div>
       </div>
+      )}
     </section>
   );
 }

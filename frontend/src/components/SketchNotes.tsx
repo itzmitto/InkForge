@@ -3,7 +3,14 @@ import type { ChangeEvent } from "react";
 
 export default function SketchNotes() {
   const [copied, setCopied] = useState(false);
-  const [fontSize, setFontSize] = useState(16);
+  const [fontSize, setFontSize] = useState(() => {
+    try {
+      const value = Number(window.localStorage.getItem("inkforge-notes-font-size"));
+      return [12, 14, 16, 18, 20, 22, 24].includes(value) ? value : 16;
+    } catch {
+      return 16;
+    }
+  });
   const [notes, setNotes] = useState(() => {
     try {
       return window.localStorage.getItem("inkforge-sketch-notes") ?? "";
@@ -79,6 +86,14 @@ export default function SketchNotes() {
     setNotes((current) => `${current}${current && !current.endsWith("\n") ? "\n" : ""}${template}`);
     setCopied(false);
   }
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("inkforge-notes-font-size", String(fontSize));
+    } catch {
+      return;
+    }
+  }, [fontSize]);
 
   return (
     <section aria-label="Sketch notes" className="fixed left-5 top-24 z-40 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-white/15 bg-[#191a1f]/95 p-3 text-white shadow-xl">

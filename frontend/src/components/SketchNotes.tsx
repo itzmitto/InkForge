@@ -27,6 +27,19 @@ export default function SketchNotes() {
     }
   }
 
+  function exportNotes() {
+    if (!notes) return;
+    const blob = new Blob([notes], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "inkforge-sketch-notes.txt";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   return (
     <section aria-label="Sketch notes" className="fixed left-5 top-24 z-40 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-white/15 bg-[#191a1f]/95 p-3 text-white shadow-xl">
       <header className="flex items-center justify-between gap-2">
@@ -47,6 +60,9 @@ export default function SketchNotes() {
           <span>Lines: {notes ? notes.split(/\r?\n/).length : 0}</span>
         </div>
         <div data-sketch-notes-actions="true" className="mt-3 flex flex-wrap gap-2">
+          <button type="button" disabled={!notes} onClick={exportNotes} className="rounded border border-white/20 px-2 py-1.5 text-xs hover:bg-white/10 disabled:opacity-40">
+            Export TXT
+          </button>
           <button type="button" disabled={!notes} onClick={copyNotes} className="rounded border border-white/20 px-2 py-1.5 text-xs hover:bg-white/10 disabled:opacity-40">
             {copied ? "Copied" : "Copy Notes"}
           </button>

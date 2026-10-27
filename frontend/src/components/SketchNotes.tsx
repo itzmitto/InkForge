@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
 
 export default function SketchNotes() {
   const [copied, setCopied] = useState(false);
@@ -40,6 +41,24 @@ export default function SketchNotes() {
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  async function importNotes(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (file.size > 1024 * 1024) {
+      window.alert("Choose a TXT file smaller than 1 MB.");
+      input.value = "";
+      return;
+    }
+    try {
+      setNotes(await file.text());
+      setCopied(false);
+    } catch {
+      window.alert("Unable to import the TXT file.");
+    }
+    input.value = "";
+  }
+
   return (
     <section aria-label="Sketch notes" className="fixed left-5 top-24 z-40 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-white/15 bg-[#191a1f]/95 p-3 text-white shadow-xl">
       <header className="flex items-center justify-between gap-2">
@@ -60,6 +79,10 @@ export default function SketchNotes() {
           <span>Lines: {notes ? notes.split(/\r?\n/).length : 0}</span>
         </div>
         <div data-sketch-notes-actions="true" className="mt-3 flex flex-wrap gap-2">
+          <label className="cursor-pointer rounded border border-white/20 px-2 py-1.5 text-xs hover:bg-white/10">
+            Import TXT
+            <input type="file" accept=".txt,text/plain" onChange={importNotes} className="sr-only" />
+          </label>
           <button type="button" disabled={!notes} onClick={exportNotes} className="rounded border border-white/20 px-2 py-1.5 text-xs hover:bg-white/10 disabled:opacity-40">
             Export TXT
           </button>

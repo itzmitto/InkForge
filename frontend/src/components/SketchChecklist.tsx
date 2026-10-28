@@ -22,6 +22,8 @@ function initialTasks(): Task[] {
 export default function SketchChecklist() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [newTask, setNewTask] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
 
   function toggleTask(id: string) {
     setTasks((current) =>
@@ -45,6 +47,16 @@ export default function SketchChecklist() {
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
+  function saveTaskEdit(id: string) {
+    const title = editText.trim().slice(0, 120);
+    if (!title) return;
+    setTasks((current) =>
+      current.map((task) => task.id === id ? { ...task, title } : task)
+    );
+    setEditingId(null);
+    setEditText("");
+  }
+
   const visibleTasks = tasks;
 
   return (
@@ -65,9 +77,34 @@ export default function SketchChecklist() {
                   onChange={() => toggleTask(task.id)}
                   className="mt-1 accent-[#cba879]"
                 />
-                <span className={`min-w-0 flex-1 break-words text-xs ${task.done ? "text-white/40 line-through" : "text-white/85"}`}>
-                  {task.title}
-                </span>
+                {editingId === task.id ? (
+                  <form
+                    className="flex min-w-0 flex-1 flex-wrap gap-1"
+                    onSubmit={(event) => { event.preventDefault(); saveTaskEdit(task.id); }}
+                  >
+                    <input
+                      aria-label="Edit task title"
+                      maxLength={120}
+                      value={editText}
+                      onChange={(event) => setEditText(event.target.value)}
+                      className="min-w-0 flex-1 rounded border border-white/20 bg-[#292a30] px-1 text-xs"
+                    />
+                    <button type="submit" className="text-[11px] text-[#cba879]">Save</button>
+                    <button type="button" onClick={() => setEditingId(null)} className="text-[11px] text-white/60">Cancel</button>
+                  </form>
+                ) : (
+                  <span className={`min-w-0 flex-1 break-words text-xs ${task.done ? "text-white/40 line-through" : "text-white/85"}`}>
+                    {task.title}
+                  </span>
+                )}
+                {editingId !== task.id && (
+                  <button
+                    type="button"
+                    aria-label={`Edit ${task.title}`}
+                    onClick={() => { setEditingId(task.id); setEditText(task.title); }}
+                    className="text-[11px] text-white/60 hover:text-white"
+                  >Edit</button>
+                )}
                 <button
                   type="button"
                   aria-label={`Delete ${task.title}`}

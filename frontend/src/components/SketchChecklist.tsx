@@ -52,6 +52,24 @@ function readTasks(): Task[] {
   }
 }
 
+const CHECKLIST_TEMPLATES = [
+  {
+    id: "portrait",
+    label: "Portrait study",
+    tasks: ["Find reference", "Block head proportions", "Place facial features", "Model light and shadow", "Refine likeness"],
+  },
+  {
+    id: "character",
+    label: "Character design",
+    tasks: ["Create silhouette", "Choose costume", "Establish anatomy", "Draw equipment", "Add final textures"],
+  },
+  {
+    id: "landscape",
+    label: "Environment sketch",
+    tasks: ["Choose horizon", "Block foreground", "Plan focal point", "Establish atmospheric depth", "Add surface details"],
+  },
+] as const;
+
 export default function SketchChecklist() {
   const [tasks, setTasks] = useState<Task[]>(readTasks);
   const [newTask, setNewTask] = useState("");
@@ -139,6 +157,17 @@ export default function SketchChecklist() {
     });
   }
 
+  function applyTemplate(templateId: string) {
+    const template = CHECKLIST_TEMPLATES.find((item) => item.id === templateId);
+    if (!template || !window.confirm("Replace the current checklist with this template?")) return;
+    setTasks(template.tasks.map((title, index) => ({
+      id: `${templateId}-${index}`,
+      title,
+      done: false,
+      priority: "normal" as const,
+    })));
+  }
+
   return (
     <section
       aria-label="Sketch checklist"
@@ -160,6 +189,22 @@ export default function SketchChecklist() {
           >
             <div className="h-full rounded-full bg-[#cba879]" style={{ width: `${completionPercent}%` }} />
           </div>
+          <label className="mt-3 block text-xs text-white/70">
+            Drawing template
+            <select
+              defaultValue=""
+              onChange={(event) => {
+                applyTemplate(event.target.value);
+                event.target.value = "";
+              }}
+              className="mt-1 w-full rounded border border-white/20 bg-[#292a30] px-2 py-1.5 text-white"
+            >
+              <option value="" disabled>Choose a template</option>
+              {CHECKLIST_TEMPLATES.map((template) => (
+                <option key={template.id} value={template.id}>{template.label}</option>
+              ))}
+            </select>
+          </label>
           <div className="mt-3 flex flex-wrap gap-1" aria-label="Checklist filters">
             {(["all", "active", "done"] as const).map((value) => (
               <button

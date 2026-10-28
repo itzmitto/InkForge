@@ -57,6 +57,7 @@ export default function SketchChecklist() {
   const [newTask, setNewTask] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "done">("all");
 
   useEffect(() => {
     try {
@@ -103,7 +104,11 @@ export default function SketchChecklist() {
     ? Math.round((completedCount / tasks.length) * 100)
     : 0;
 
-  const visibleTasks = tasks;
+  const visibleTasks = tasks.filter((task) => {
+    if (statusFilter === "active" && task.done) return false;
+    if (statusFilter === "done" && !task.done) return false;
+    return true;
+  });
 
   return (
     <section
@@ -125,6 +130,19 @@ export default function SketchChecklist() {
             className="mt-2 h-2 overflow-hidden rounded-full bg-white/15"
           >
             <div className="h-full rounded-full bg-[#cba879]" style={{ width: `${completionPercent}%` }} />
+          </div>
+          <div className="mt-3 flex flex-wrap gap-1" aria-label="Checklist filters">
+            {(["all", "active", "done"] as const).map((value) => (
+              <button
+                type="button"
+                key={value}
+                aria-pressed={statusFilter === value}
+                onClick={() => setStatusFilter(value)}
+                className={`rounded border px-2 py-1 text-[11px] ${statusFilter === value ? "border-[#cba879] text-[#cba879]" : "border-white/15 text-white/60"}`}
+              >
+                {value === "done" ? "Completed" : value === "active" ? "Active" : "All"}
+              </button>
+            ))}
           </div>
           <ul className="mt-3 max-h-[38vh] space-y-1 overflow-y-auto" aria-label="Sketch tasks">
             {visibleTasks.map((task) => (

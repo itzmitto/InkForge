@@ -225,6 +225,15 @@ export default function SketchChecklist() {
     }
   }
 
+  function exportText() {
+    const lines = [
+      "InkForge Sketch Checklist",
+      "========================",
+      ...tasks.map((task) => `${task.done ? "[x]" : "[ ]"} ${task.title}${task.priority === "high" ? " [HIGH]" : ""}`),
+    ];
+    downloadChecklist("inkforge-sketch-checklist.txt", lines.join("\n"), "text/plain;charset=utf-8");
+  }
+
   return (
     <section
       aria-label="Sketch checklist"
@@ -375,6 +384,7 @@ export default function SketchChecklist() {
           <button type="button" onClick={clearCompleted} disabled={!tasks.some((task) => task.done)} className="mt-3 rounded border border-red-400/25 px-2 py-1.5 text-[11px] text-red-300 disabled:opacity-40">Clear completed</button>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" onClick={exportJson} className="rounded border border-white/20 px-2 py-1.5 text-[11px]">Export JSON</button>
+            <button type="button" onClick={exportText} className="rounded border border-white/20 px-2 py-1.5 text-[11px]">Export TXT</button>
           </div>
           <label className="mt-3 block text-[11px] text-white/70">
             Import JSON checklist

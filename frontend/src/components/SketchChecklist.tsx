@@ -59,6 +59,7 @@ export default function SketchChecklist() {
   const [editText, setEditText] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "done">("all");
   const [search, setSearch] = useState("");
+  const [onlyHigh, setOnlyHigh] = useState(false);
 
   useEffect(() => {
     try {
@@ -109,6 +110,7 @@ export default function SketchChecklist() {
     if (statusFilter === "active" && task.done) return false;
     if (statusFilter === "done" && !task.done) return false;
     if (!task.title.toLowerCase().includes(search.trim().toLowerCase())) return false;
+    if (onlyHigh && task.priority !== "high") return false;
     return true;
   });
 
@@ -168,6 +170,10 @@ export default function SketchChecklist() {
             onChange={(event) => setSearch(event.target.value)}
             className="mt-2 w-full rounded border border-white/20 bg-[#292a30] px-2 py-2 text-xs text-white"
           />
+          <label className="mt-2 flex items-center gap-2 text-xs text-white/70">
+            <input type="checkbox" checked={onlyHigh} onChange={(event) => setOnlyHigh(event.target.checked)} />
+            High priority only
+          </label>
           <ul className="mt-3 max-h-[38vh] space-y-1 overflow-y-auto" aria-label="Sketch tasks">
             {visibleTasks.map((task) => (
               <li key={task.id} className="flex items-start gap-2 rounded-md border border-white/10 bg-white/5 p-2">

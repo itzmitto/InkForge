@@ -78,7 +78,13 @@ export default function SketchChecklist() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "done">("all");
   const [search, setSearch] = useState("");
   const [onlyHigh, setOnlyHigh] = useState(false);
-  const [panelOpen, setPanelOpen] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(() => {
+    try {
+      return window.localStorage.getItem("inkforge-checklist-expanded") !== "false";
+    } catch {
+      return true;
+    }
+  });
 
   useEffect(() => {
     try {
@@ -87,6 +93,14 @@ export default function SketchChecklist() {
       // The checklist remains usable when storage is unavailable.
     }
   }, [tasks]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("inkforge-checklist-expanded", String(panelOpen));
+    } catch {
+      // Ignore unavailable browser storage.
+    }
+  }, [panelOpen]);
 
   function toggleTask(id: string) {
     setTasks((current) =>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Task = {
   id: string;
@@ -19,11 +19,52 @@ function initialTasks(): Task[] {
   return DEFAULT_TASKS.map((task) => ({ ...task }));
 }
 
+const TASK_STORAGE_KEY = "inkforge-sketch-checklist";
+
+function isTask(value: unknown): value is Task {
+  if (typeof value !== "object" || value === null) return false;
+  const task = value as Partial<Task>;
+  return (
+    typeof task.id === "string" &&
+    task.id.length > 0 &&
+    typeof task.title === "string" &&
+    task.title.length > 0 &&
+    task.title.length <= 120 &&
+    typeof task.done === "boolean" &&
+    (task.priority === "normal" || task.priority === "high")
+  );
+}
+
+function readTasks(): Task[] {
+  try {
+    const stored = window.localStorage.getItem(TASK_STORAGE_KEY);
+    if (!stored) return initialTasks();
+    const data: unknown = JSON.parse(stored);
+    if (!Array.isArray(data) || data.length > 200 || !data.every(isTask)) {
+      return initialTasks();
+    }
+    if (new Set(data.map((task: Task) => task.id)).size !== data.length) {
+      return initialTasks();
+    }
+    return data;
+  } catch {
+    return initialTasks();
+  }
+}
+
 export default function SketchChecklist() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>(readTasks);
   const [newTask, setNewTask] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(tasks));
+    } catch {
+      // The checklist remains usable when storage is unavailable.
+    }
+  }, [tasks]);
 
   function toggleTask(id: string) {
     setTasks((current) =>

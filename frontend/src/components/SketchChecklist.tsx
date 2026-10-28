@@ -21,6 +21,7 @@ function initialTasks(): Task[] {
 
 export default function SketchChecklist() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [newTask, setNewTask] = useState("");
 
   function toggleTask(id: string) {
     setTasks((current) =>
@@ -28,6 +29,16 @@ export default function SketchChecklist() {
         task.id === id ? { ...task, done: !task.done } : task
       )
     );
+  }
+
+  function addTask() {
+    const title = newTask.trim().slice(0, 120);
+    if (!title || tasks.length >= 200) return;
+    setTasks((current) => [
+      ...current,
+      { id: crypto.randomUUID(), title, done: false, priority: "normal" },
+    ]);
+    setNewTask("");
   }
 
   const visibleTasks = tasks;
@@ -59,6 +70,20 @@ export default function SketchChecklist() {
           {visibleTasks.length === 0 && (
             <p className="mt-2 text-xs text-white/50">No tasks to show.</p>
           )}
+          <form
+            className="mt-3 flex gap-2"
+            onSubmit={(event) => { event.preventDefault(); addTask(); }}
+          >
+            <input
+              aria-label="New sketch task"
+              value={newTask}
+              maxLength={120}
+              onChange={(event) => setNewTask(event.target.value)}
+              placeholder="New sketch task..."
+              className="min-w-0 flex-1 rounded border border-white/20 bg-[#292a30] px-2 py-2 text-xs text-white"
+            />
+            <button type="submit" disabled={!newTask.trim() || tasks.length >= 200} className="rounded bg-[#cba879] px-3 py-2 text-xs font-semibold text-[#191a1f] disabled:opacity-40">Add</button>
+          </form>
     </section>
   );
 }

@@ -99,6 +99,9 @@ export default function SketchChecklist() {
   }
 
   const completedCount = tasks.filter((task) => task.done).length;
+  const completionPercent = tasks.length
+    ? Math.round((completedCount / tasks.length) * 100)
+    : 0;
 
   const visibleTasks = tasks;
 
@@ -113,6 +116,16 @@ export default function SketchChecklist() {
           <p className="mt-2 text-xs text-white/65">
             {completedCount} / {tasks.length} tasks completed
           </p>
+          <div
+            role="progressbar"
+            aria-label="Checklist completion"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={completionPercent}
+            className="mt-2 h-2 overflow-hidden rounded-full bg-white/15"
+          >
+            <div className="h-full rounded-full bg-[#cba879]" style={{ width: `${completionPercent}%` }} />
+          </div>
           <ul className="mt-3 max-h-[38vh] space-y-1 overflow-y-auto" aria-label="Sketch tasks">
             {visibleTasks.map((task) => (
               <li key={task.id} className="flex items-start gap-2 rounded-md border border-white/10 bg-white/5 p-2">

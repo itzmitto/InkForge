@@ -1,3 +1,4 @@
+import SketchChecklist from "./components/SketchChecklist";
 import SketchNotes from "./components/SketchNotes";
 import DrawingPrompts from "./components/DrawingPrompts";
 import BreakReminder from "./components/BreakReminder";
@@ -331,6 +332,7 @@ function App() {
                 pencilGrade={pencilGrade}
               />
               <PracticeTimer />
+              <SketchChecklist />
               <SketchNotes />
               <BreakReminder />
               <DrawingPrompts />

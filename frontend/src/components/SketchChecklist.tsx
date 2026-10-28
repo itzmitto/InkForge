@@ -70,6 +70,18 @@ const CHECKLIST_TEMPLATES = [
   },
 ] as const;
 
+function downloadChecklist(filename: string, contents: string, mime: string) {
+  const blob = new Blob([contents], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 export default function SketchChecklist() {
   const [tasks, setTasks] = useState<Task[]>(readTasks);
   const [newTask, setNewTask] = useState("");
@@ -181,6 +193,14 @@ export default function SketchChecklist() {
       done: false,
       priority: "normal" as const,
     })));
+  }
+
+  function exportJson() {
+    downloadChecklist(
+      "inkforge-sketch-checklist.json",
+      JSON.stringify({ version: 1, tasks }, null, 2),
+      "application/json;charset=utf-8"
+    );
   }
 
   return (
@@ -331,6 +351,9 @@ export default function SketchChecklist() {
             <button type="submit" disabled={!newTask.trim() || tasks.length >= 200} className="rounded bg-[#cba879] px-3 py-2 text-xs font-semibold text-[#191a1f] disabled:opacity-40">Add</button>
           </form>
           <button type="button" onClick={clearCompleted} disabled={!tasks.some((task) => task.done)} className="mt-3 rounded border border-red-400/25 px-2 py-1.5 text-[11px] text-red-300 disabled:opacity-40">Clear completed</button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={exportJson} className="rounded border border-white/20 px-2 py-1.5 text-[11px]">Export JSON</button>
+          </div>
         </div>
       )}
     </section>

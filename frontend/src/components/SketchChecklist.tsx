@@ -97,6 +97,7 @@ export default function SketchChecklist() {
       return true;
     }
   });
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     try {
@@ -201,6 +202,27 @@ export default function SketchChecklist() {
       JSON.stringify({ version: 1, tasks }, null, 2),
       "application/json;charset=utf-8"
     );
+  }
+
+  async function importJson(file: File) {
+    try {
+      if (file.size > 100_000) throw new Error("File too large (100 KB maximum).");
+      const parsed: unknown = JSON.parse(await file.text());
+      if (typeof parsed !== "object" || parsed === null || !("tasks" in parsed)) {
+        throw new Error("Not an InkForge checklist file.");
+      }
+      const imported = (parsed as { tasks: unknown }).tasks;
+      if (!Array.isArray(imported) || imported.length > 200 || !imported.every(isTask)) {
+        throw new Error("Invalid tasks in checklist file.");
+      }
+      const unique = new Set(imported.map((task: Task) => task.id));
+      if (unique.size !== imported.length) throw new Error("Duplicate task IDs.");
+      if (!window.confirm("Replace the current checklist with imported tasks?")) return;
+      setTasks(imported);
+      setMessage(`Imported ${imported.length} tasks.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not import checklist.");
+    }
   }
 
   return (
@@ -354,6 +376,20 @@ export default function SketchChecklist() {
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" onClick={exportJson} className="rounded border border-white/20 px-2 py-1.5 text-[11px]">Export JSON</button>
           </div>
+          <label className="mt-3 block text-[11px] text-white/70">
+            Import JSON checklist
+            <input
+              type="file"
+              accept=".json,application/json"
+              onChange={(event) => {
+                const file = event.currentTarget.files?.[0];
+                if (file) void importJson(file);
+                event.currentTarget.value = "";
+              }}
+              className="mt-1 block w-full text-[11px] text-white/65 file:mr-2 file:rounded file:border-0 file:bg-white/10 file:px-2 file:py-1 file:text-white"
+            />
+          </label>
+          {message && <p role="status" className="mt-2 text-xs text-white/75">{message}</p>}
         </div>
       )}
     </section>

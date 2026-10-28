@@ -41,6 +41,10 @@ export default function SketchChecklist() {
     setNewTask("");
   }
 
+  function removeTask(id: string) {
+    setTasks((current) => current.filter((task) => task.id !== id));
+  }
+
   const visibleTasks = tasks;
 
   return (
@@ -64,6 +68,12 @@ export default function SketchChecklist() {
                 <span className={`min-w-0 flex-1 break-words text-xs ${task.done ? "text-white/40 line-through" : "text-white/85"}`}>
                   {task.title}
                 </span>
+                <button
+                  type="button"
+                  aria-label={`Delete ${task.title}`}
+                  onClick={() => removeTask(task.id)}
+                  className="text-[11px] text-white/50 hover:text-red-300"
+                >Delete</button>
               </li>
             ))}
           </ul>

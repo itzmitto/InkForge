@@ -98,6 +98,8 @@ export default function SketchChecklist() {
     setEditText("");
   }
 
+  const completedCount = tasks.filter((task) => task.done).length;
+
   const visibleTasks = tasks;
 
   return (
@@ -108,6 +110,9 @@ export default function SketchChecklist() {
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold">Sketch Checklist</h2>
       </div>
+          <p className="mt-2 text-xs text-white/65">
+            {completedCount} / {tasks.length} tasks completed
+          </p>
           <ul className="mt-3 max-h-[38vh] space-y-1 overflow-y-auto" aria-label="Sketch tasks">
             {visibleTasks.map((task) => (
               <li key={task.id} className="flex items-start gap-2 rounded-md border border-white/10 bg-white/5 p-2">

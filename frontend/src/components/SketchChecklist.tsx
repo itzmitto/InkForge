@@ -128,6 +128,17 @@ export default function SketchChecklist() {
     ));
   }
 
+  function moveTask(id: string, delta: -1 | 1) {
+    setTasks((current) => {
+      const index = current.findIndex((task) => task.id === id);
+      const target = index + delta;
+      if (index < 0 || target < 0 || target >= current.length) return current;
+      const next = [...current];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+
   return (
     <section
       aria-label="Sketch checklist"
@@ -213,6 +224,8 @@ export default function SketchChecklist() {
                 >
                   {task.priority === "high" ? "High" : "Low"}
                 </button>
+                <button type="button" aria-label={`Move ${task.title} up`} disabled={tasks[0]?.id === task.id} onClick={() => moveTask(task.id, -1)} className="text-xs text-white/60 disabled:opacity-20">↑</button>
+                <button type="button" aria-label={`Move ${task.title} down`} disabled={tasks[tasks.length - 1]?.id === task.id} onClick={() => moveTask(task.id, 1)} className="text-xs text-white/60 disabled:opacity-20">↓</button>
                 {editingId !== task.id && (
                   <button
                     type="button"

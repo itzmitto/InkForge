@@ -118,6 +118,14 @@ export default function SketchChecklist() {
     setTasks((current) => current.filter((task) => !task.done));
   }
 
+  function togglePriority(id: string) {
+    setTasks((current) => current.map((task) =>
+      task.id === id
+        ? { ...task, priority: task.priority === "high" ? "normal" : "high" }
+        : task
+    ));
+  }
+
   return (
     <section
       aria-label="Sketch checklist"
@@ -190,6 +198,15 @@ export default function SketchChecklist() {
                     {task.title}
                   </span>
                 )}
+                <button
+                  type="button"
+                  aria-pressed={task.priority === "high"}
+                  aria-label={`Toggle priority for ${task.title}`}
+                  onClick={() => togglePriority(task.id)}
+                  className={`rounded px-1 text-[10px] ${task.priority === "high" ? "text-amber-300" : "text-white/40"}`}
+                >
+                  {task.priority === "high" ? "High" : "Low"}
+                </button>
                 {editingId !== task.id && (
                   <button
                     type="button"

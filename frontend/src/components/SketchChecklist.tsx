@@ -1,0 +1,64 @@
+import { useState } from "react";
+
+type Task = {
+  id: string;
+  title: string;
+  done: boolean;
+  priority: "normal" | "high";
+};
+
+const DEFAULT_TASKS: Task[] = [
+  { id: "base-1", title: "Plan composition", done: false, priority: "normal" },
+  { id: "base-2", title: "Sketch basic shapes", done: false, priority: "normal" },
+  { id: "base-3", title: "Refine proportions", done: false, priority: "normal" },
+  { id: "base-4", title: "Add values and shadows", done: false, priority: "normal" },
+  { id: "base-5", title: "Finish details", done: false, priority: "normal" },
+];
+
+function initialTasks(): Task[] {
+  return DEFAULT_TASKS.map((task) => ({ ...task }));
+}
+
+export default function SketchChecklist() {
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+
+  function toggleTask(id: string) {
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === id ? { ...task, done: !task.done } : task
+      )
+    );
+  }
+
+  const visibleTasks = tasks;
+
+  return (
+    <section
+      aria-label="Sketch checklist"
+      className="fixed bottom-5 left-5 z-50 w-80 max-w-[calc(100vw-2.5rem)] rounded-xl border border-white/20 bg-[#191a1f]/95 p-3 text-white shadow-xl"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold">Sketch Checklist</h2>
+      </div>
+          <ul className="mt-3 max-h-[38vh] space-y-1 overflow-y-auto" aria-label="Sketch tasks">
+            {visibleTasks.map((task) => (
+              <li key={task.id} className="flex items-start gap-2 rounded-md border border-white/10 bg-white/5 p-2">
+                <input
+                  type="checkbox"
+                  aria-label={`Mark ${task.title} as completed`}
+                  checked={task.done}
+                  onChange={() => toggleTask(task.id)}
+                  className="mt-1 accent-[#cba879]"
+                />
+                <span className={`min-w-0 flex-1 break-words text-xs ${task.done ? "text-white/40 line-through" : "text-white/85"}`}>
+                  {task.title}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {visibleTasks.length === 0 && (
+            <p className="mt-2 text-xs text-white/50">No tasks to show.</p>
+          )}
+    </section>
+  );
+}

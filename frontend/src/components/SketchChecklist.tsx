@@ -58,6 +58,7 @@ export default function SketchChecklist() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "done">("all");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     try {
@@ -107,6 +108,7 @@ export default function SketchChecklist() {
   const visibleTasks = tasks.filter((task) => {
     if (statusFilter === "active" && task.done) return false;
     if (statusFilter === "done" && !task.done) return false;
+    if (!task.title.toLowerCase().includes(search.trim().toLowerCase())) return false;
     return true;
   });
 
@@ -144,6 +146,14 @@ export default function SketchChecklist() {
               </button>
             ))}
           </div>
+          <input
+            type="search"
+            aria-label="Search checklist tasks"
+            placeholder="Search tasks..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="mt-2 w-full rounded border border-white/20 bg-[#292a30] px-2 py-2 text-xs text-white"
+          />
           <ul className="mt-3 max-h-[38vh] space-y-1 overflow-y-auto" aria-label="Sketch tasks">
             {visibleTasks.map((task) => (
               <li key={task.id} className="flex items-start gap-2 rounded-md border border-white/10 bg-white/5 p-2">

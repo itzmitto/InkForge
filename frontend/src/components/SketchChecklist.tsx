@@ -234,6 +234,20 @@ export default function SketchChecklist() {
     downloadChecklist("inkforge-sketch-checklist.txt", lines.join("\n"), "text/plain;charset=utf-8");
   }
 
+  async function copySummary() {
+    const done = tasks.filter((task) => task.done).length;
+    const text = [
+      `InkForge Sketch Checklist: ${done}/${tasks.length} complete`,
+      ...tasks.map((task) => `${task.done ? "[x]" : "[ ]"} ${task.title}`),
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+      setMessage("Checklist summary copied.");
+    } catch {
+      setMessage("Clipboard unavailable. Try exporting as TXT.");
+    }
+  }
+
   return (
     <section
       aria-label="Sketch checklist"
@@ -385,6 +399,7 @@ export default function SketchChecklist() {
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" onClick={exportJson} className="rounded border border-white/20 px-2 py-1.5 text-[11px]">Export JSON</button>
             <button type="button" onClick={exportText} className="rounded border border-white/20 px-2 py-1.5 text-[11px]">Export TXT</button>
+            <button type="button" onClick={copySummary} className="rounded border border-white/20 px-2 py-1.5 text-[11px]">Copy summary</button>
           </div>
           <label className="mt-3 block text-[11px] text-white/70">
             Import JSON checklist

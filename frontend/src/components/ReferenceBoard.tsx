@@ -99,6 +99,13 @@ function formatSize(bytes: number): string {
     setImageOpacity(100);
   }
 
+  function toggleFavorite() {
+    if (!selected) return;
+    setImages((current) => current.map((image) =>
+      image.id === selected.id ? { ...image, favorite: !image.favorite } : image
+    ));
+  }
+
   const visibleImages = images;
 
   return (
@@ -187,6 +194,7 @@ function formatSize(bytes: number): string {
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" disabled={!selected} onClick={removeSelected} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Remove image</button>
               <button type="button" disabled={!images.length} onClick={clearBoard} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Clear all</button>
+              <button type="button" disabled={!selected} onClick={toggleFavorite} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">{selected?.favorite ? "★ Favorited" : "☆ Favorite"}</button>
             </div>
             <div className="mt-4 space-y-2 rounded-xl border border-current/10 p-3 text-xs">
               <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Image adjustments</p>
@@ -221,6 +229,7 @@ function formatSize(bytes: number): string {
                     className={`relative overflow-hidden rounded-lg border p-1 text-left ${selectedId === image.id ? "border-sky-400" : "border-slate-500/30"}`}
                   >
                     <img alt="" src={image.url} className="h-14 w-full rounded object-cover" />
+                    {image.favorite && <span className="absolute right-1 top-0 text-yellow-300">★</span>}
                     {!gridView && <span className="block truncate text-[10px]" title={image.name}>{image.name}</span>}
                   </button>
                 ))}

@@ -108,6 +108,16 @@ function formatSize(bytes: number): string {
       image.id === selected.id ? { ...image, favorite: !image.favorite } : image
     ));
   }
+
+  function downloadReference() {
+    if (!selected) return;
+    const link = document.createElement("a");
+    link.href = selected.url;
+    link.download = selected.name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
   const visibleImages = images.filter((image) =>
     (!favoritesOnly || image.favorite) &&
     image.name.toLowerCase().includes(search.toLowerCase())
@@ -200,6 +210,7 @@ function formatSize(bytes: number): string {
               <button type="button" disabled={!selected} onClick={removeSelected} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Remove image</button>
               <button type="button" disabled={!images.length} onClick={clearBoard} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Clear all</button>
               <button type="button" disabled={!selected} onClick={toggleFavorite} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">{selected?.favorite ? "★ Favorited" : "☆ Favorite"}</button>
+              <button type="button" disabled={!selected} onClick={downloadReference} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">Download</button>
             </div>
             <div className="mt-4 space-y-2 rounded-xl border border-current/10 p-3 text-xs">
               <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Image adjustments</p>

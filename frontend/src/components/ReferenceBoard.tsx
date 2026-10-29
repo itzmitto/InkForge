@@ -31,6 +31,7 @@ function formatSize(bytes: number): string {
   const [sepia, setSepia] = useState(false);
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
+  const [saturation, setSaturation] = useState(100);
   const accent = "#93c5fd";
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
@@ -150,7 +151,7 @@ function formatSize(bytes: number): string {
                     alt={`Reference: ${selected.name}`}
                     className="max-h-full max-w-full"
                     draggable={false}
-                    style={{ transform: `scale(${zoom / 100}) rotate(${rotation}deg) scaleX(${flippedX ? -1 : 1}) scaleY(${flippedY ? -1 : 1})`, filter: `grayscale(${grayscale ? 100 : 0}%) sepia(${sepia ? 100 : 0}%) brightness(${brightness}%) contrast(${contrast}%)` }}
+                    style={{ transform: `scale(${zoom / 100}) rotate(${rotation}deg) scaleX(${flippedX ? -1 : 1}) scaleY(${flippedY ? -1 : 1})`, filter: `grayscale(${grayscale ? 100 : 0}%) sepia(${sepia ? 100 : 0}%) brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)` }}
                   />
                 </div>
               ) : (
@@ -179,6 +180,7 @@ function formatSize(bytes: number): string {
               <label className="flex items-center gap-2"><input type="checkbox" checked={sepia} onChange={(event) => setSepia(event.target.checked)}/>Sepia</label>
               <label className="flex items-center gap-3">Brightness<input aria-label="Brightness" className="ml-auto w-28" type="range" min={25} max={200} step={5} value={brightness} onChange={(event) => setBrightness(Number(event.target.value))}/><span className="w-8 text-right font-mono text-[10px]">{brightness}</span></label>
               <label className="flex items-center gap-3">Contrast<input aria-label="Contrast" className="ml-auto w-28" type="range" min={25} max={200} step={5} value={contrast} onChange={(event) => setContrast(Number(event.target.value))}/><span className="w-8 text-right font-mono text-[10px]">{contrast}</span></label>
+              <label className="flex items-center gap-3">Saturation<input aria-label="Saturation" className="ml-auto w-28" type="range" min={0} max={200} step={5} value={saturation} onChange={(event) => setSaturation(Number(event.target.value))}/><span className="w-8 text-right font-mono text-[10px]">{saturation}</span></label>
             </div>
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">

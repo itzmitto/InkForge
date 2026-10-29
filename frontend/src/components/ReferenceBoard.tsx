@@ -50,6 +50,7 @@ function formatSize(bytes: number): string {
   });
   const [light, setLight] = useState(false);
   const [compact, setCompact] = useState(false);
+  const [dockLeft, setDockLeft] = useState(false);
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
 
@@ -173,7 +174,7 @@ function formatSize(bytes: number): string {
   return (
     <div
       className="pointer-events-none fixed top-24 z-[90]"
-      style={{ right: 16 }}
+      style={dockLeft ? { left: 16 } : { right: 16 }}
     >
       <div className="pointer-events-auto flex flex-col items-end gap-2">
         <button
@@ -242,6 +243,9 @@ function formatSize(bytes: number): string {
             </button>
             <button type="button" onClick={() => setCompact((current) => !current)} className="ml-2 mt-2 rounded-lg border border-current/20 px-3 py-1.5 text-xs">
               {compact ? "Comfortable spacing" : "Compact spacing"}
+            </button>
+            <button type="button" onClick={() => setDockLeft((current) => !current)} className="ml-2 mt-2 rounded-lg border border-current/20 px-3 py-1.5 text-xs">
+              Dock {dockLeft ? "right" : "left"}
             </button>
             <div className="mt-4 overflow-hidden rounded-xl border border-slate-500/20 bg-[#111827]">
               {selected ? (

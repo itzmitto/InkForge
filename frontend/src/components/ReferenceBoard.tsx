@@ -18,6 +18,10 @@ export default function ReferenceBoard() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+function formatSize(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+}
   const accent = "#93c5fd";
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
@@ -118,6 +122,12 @@ export default function ReferenceBoard() {
                 </div>
               )}
             </div>
+            {selected && (
+              <div className="mt-2 flex flex-wrap justify-between gap-2 font-mono text-[10px] opacity-60">
+                <span className="max-w-56 truncate" title={selected.name}>{selected.name}</span>
+                <span>{formatSize(selected.file.size)} · {selected.file.type || "image"}</span>
+              </div>
+            )}
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-60">Reference library</h3>

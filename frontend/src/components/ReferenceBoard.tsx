@@ -25,6 +25,7 @@ function formatSize(bytes: number): string {
   const [gridView, setGridView] = useState(true);
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
+  const [flippedX, setFlippedX] = useState(false);
   const accent = "#93c5fd";
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
@@ -144,7 +145,7 @@ function formatSize(bytes: number): string {
                     alt={`Reference: ${selected.name}`}
                     className="max-h-full max-w-full"
                     draggable={false}
-                    style={{ transform: `scale(${zoom / 100}) rotate(${rotation}deg)` }}
+                    style={{ transform: `scale(${zoom / 100}) rotate(${rotation}deg) scaleX(${flippedX ? -1 : 1})` }}
                   />
                 </div>
               ) : (
@@ -167,6 +168,7 @@ function formatSize(bytes: number): string {
               <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Image adjustments</p>
               <label className="flex items-center gap-3">Zoom<input aria-label="Zoom" className="ml-auto w-28" type="range" min={25} max={250} step={5} value={zoom} onChange={(event) => setZoom(Number(event.target.value))}/><span className="w-8 text-right font-mono text-[10px]">{zoom}</span></label>
               <button type="button" onClick={() => setRotation((value) => (value + 90) % 360)} className="rounded-lg border border-current/20 px-2 py-1">Rotate 90°</button>
+              <button type="button" onClick={() => setFlippedX((value) => !value)} className="ml-2 rounded-lg border border-current/20 px-2 py-1">Flip horizontal</button>
             </div>
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">

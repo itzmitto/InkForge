@@ -63,6 +63,14 @@ function formatSize(bytes: number): string {
     setMessage("Reference removed.");
   }
 
+  function clearBoard() {
+    if (!images.length || !window.confirm("Remove all reference images?")) return;
+    images.forEach((image) => URL.revokeObjectURL(image.url));
+    setImages([]);
+    setSelectedId(null);
+    setMessage("Board cleared.");
+  }
+
   const visibleImages = images;
 
   return (
@@ -139,6 +147,7 @@ function formatSize(bytes: number): string {
             )}
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" disabled={!selected} onClick={removeSelected} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Remove image</button>
+              <button type="button" disabled={!images.length} onClick={clearBoard} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Clear all</button>
             </div>
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">

@@ -23,6 +23,7 @@ function formatSize(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
   const [gridView, setGridView] = useState(true);
+  const [zoom, setZoom] = useState(100);
   const accent = "#93c5fd";
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
@@ -142,6 +143,7 @@ function formatSize(bytes: number): string {
                     alt={`Reference: ${selected.name}`}
                     className="max-h-full max-w-full"
                     draggable={false}
+                    style={{ transform: `scale(${zoom / 100})` }}
                   />
                 </div>
               ) : (
@@ -159,6 +161,10 @@ function formatSize(bytes: number): string {
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" disabled={!selected} onClick={removeSelected} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Remove image</button>
               <button type="button" disabled={!images.length} onClick={clearBoard} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Clear all</button>
+            </div>
+            <div className="mt-4 space-y-2 rounded-xl border border-current/10 p-3 text-xs">
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Image adjustments</p>
+              <label className="flex items-center gap-3">Zoom<input aria-label="Zoom" className="ml-auto w-28" type="range" min={25} max={250} step={5} value={zoom} onChange={(event) => setZoom(Number(event.target.value))}/><span className="w-8 text-right font-mono text-[10px]">{zoom}</span></label>
             </div>
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">

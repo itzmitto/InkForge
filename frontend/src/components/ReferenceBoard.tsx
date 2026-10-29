@@ -35,6 +35,7 @@ function formatSize(bytes: number): string {
   const [blur, setBlur] = useState(0);
   const [fit, setFit] = useState<"contain" | "cover">("contain");
   const [imageOpacity, setImageOpacity] = useState(100);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
   const accent = "#93c5fd";
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
@@ -105,8 +106,9 @@ function formatSize(bytes: number): string {
       image.id === selected.id ? { ...image, favorite: !image.favorite } : image
     ));
   }
-
-  const visibleImages = images;
+  const visibleImages = images.filter((image) =>
+    (!favoritesOnly || image.favorite)
+  );
 
   return (
     <div
@@ -217,6 +219,7 @@ function formatSize(bytes: number): string {
                 <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-60">Reference library</h3>
                 <button type="button" onClick={() => setGridView((value) => !value)} className="rounded border border-current/20 px-2 py-1 text-[10px]">{gridView ? "List view" : "Grid view"}</button>
               </div>
+              <label className="flex items-center gap-2 text-[11px]"><input type="checkbox" checked={favoritesOnly} onChange={(event) => setFavoritesOnly(event.target.checked)}/>Favorites only</label>
               <div className={gridView ? "grid grid-cols-4 gap-2" : "flex flex-col gap-2"}>
                 {visibleImages.map((image) => (
                   <button

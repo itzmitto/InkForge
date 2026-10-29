@@ -22,6 +22,7 @@ export default function ReferenceBoard() {
 function formatSize(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
+  const [gridView, setGridView] = useState(true);
   const accent = "#93c5fd";
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
@@ -162,8 +163,9 @@ function formatSize(bytes: number): string {
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-60">Reference library</h3>
+                <button type="button" onClick={() => setGridView((value) => !value)} className="rounded border border-current/20 px-2 py-1 text-[10px]">{gridView ? "List view" : "Grid view"}</button>
               </div>
-              <div className={"grid grid-cols-4 gap-2"}>
+              <div className={gridView ? "grid grid-cols-4 gap-2" : "flex flex-col gap-2"}>
                 {visibleImages.map((image) => (
                   <button
                     type="button"
@@ -175,6 +177,7 @@ function formatSize(bytes: number): string {
                     className={`relative overflow-hidden rounded-lg border p-1 text-left ${selectedId === image.id ? "border-sky-400" : "border-slate-500/30"}`}
                   >
                     <img alt="" src={image.url} className="h-14 w-full rounded object-cover" />
+                    {!gridView && <span className="block truncate text-[10px]" title={image.name}>{image.name}</span>}
                   </button>
                 ))}
               </div>

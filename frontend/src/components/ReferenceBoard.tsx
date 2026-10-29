@@ -15,11 +15,12 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024;
 export default function ReferenceBoard() {
   const [open, setOpen] = useState(false);
   const [images, setImages] = useState<ReferenceImage[]>([]);
-  const [, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const accent = "#93c5fd";
 
+  const selected = images.find((image) => image.id === selectedId) ?? null;
 
   function addFiles(files: FileList | File[]) {
     const valid = Array.from(files).filter(
@@ -96,6 +97,25 @@ export default function ReferenceBoard() {
             >
               + Add reference images
             </button>
+            <div className="mt-4 overflow-hidden rounded-xl border border-slate-500/20 bg-[#111827]">
+              {selected ? (
+                <div
+                  className="relative flex items-center justify-center overflow-hidden"
+                  style={{ height: 235 }}
+                >
+                  <img
+                    src={selected.url}
+                    alt={`Reference: ${selected.name}`}
+                    className="max-h-full max-w-full"
+                    draggable={false}
+                  />
+                </div>
+              ) : (
+                <div className="flex h-48 items-center justify-center text-center text-xs text-slate-400">
+                  Import an image to use as a drawing reference.
+                </div>
+              )}
+            </div>
             {message && <p role="status" className="mt-3 text-[11px] opacity-70">{message}</p>}
             <p className="mt-3 border-t border-current/10 pt-3 text-[10px] opacity-50">
               Images stay in this browser tab. Nothing is uploaded to a server.

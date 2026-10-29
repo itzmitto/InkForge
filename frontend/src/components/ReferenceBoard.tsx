@@ -54,6 +54,15 @@ function formatSize(bytes: number): string {
     if (inputRef.current) inputRef.current.value = "";
   }
 
+  function removeSelected() {
+    if (!selected) return;
+    URL.revokeObjectURL(selected.url);
+    const remaining = images.filter((image) => image.id !== selected.id);
+    setImages(remaining);
+    setSelectedId(remaining[0]?.id ?? null);
+    setMessage("Reference removed.");
+  }
+
   const visibleImages = images;
 
   return (
@@ -128,6 +137,9 @@ function formatSize(bytes: number): string {
                 <span>{formatSize(selected.file.size)} · {selected.file.type || "image"}</span>
               </div>
             )}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" disabled={!selected} onClick={removeSelected} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Remove image</button>
+            </div>
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-60">Reference library</h3>

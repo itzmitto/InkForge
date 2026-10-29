@@ -50,6 +50,8 @@ export default function ReferenceBoard() {
     if (inputRef.current) inputRef.current.value = "";
   }
 
+  const visibleImages = images;
+
   return (
     <div
       className="pointer-events-none fixed top-24 z-[90]"
@@ -115,6 +117,26 @@ export default function ReferenceBoard() {
                   Import an image to use as a drawing reference.
                 </div>
               )}
+            </div>
+            <div className="mt-4 border-t border-current/10 pt-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-60">Reference library</h3>
+              </div>
+              <div className={"grid grid-cols-4 gap-2"}>
+                {visibleImages.map((image) => (
+                  <button
+                    type="button"
+                    key={image.id}
+                    title={image.name}
+                    aria-label={`Select ${image.name}`}
+                    aria-pressed={selectedId === image.id}
+                    onClick={() => setSelectedId(image.id)}
+                    className={`relative overflow-hidden rounded-lg border p-1 text-left ${selectedId === image.id ? "border-sky-400" : "border-slate-500/30"}`}
+                  >
+                    <img alt="" src={image.url} className="h-14 w-full rounded object-cover" />
+                  </button>
+                ))}
+              </div>
             </div>
             {message && <p role="status" className="mt-3 text-[11px] opacity-70">{message}</p>}
             <p className="mt-3 border-t border-current/10 pt-3 text-[10px] opacity-50">

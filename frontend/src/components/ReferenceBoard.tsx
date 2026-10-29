@@ -140,6 +140,12 @@ function formatSize(bytes: number): string {
       setMessage("Clipboard image copy is not supported here.");
     }
   }
+
+  function navigate(delta: number) {
+    if (images.length === 0) return;
+    const index = images.findIndex((image) => image.id === selectedId);
+    setSelectedId(images[(index + delta + images.length) % images.length].id);
+  }
   const visibleImages = images.filter((image) =>
     (!favoritesOnly || image.favorite) &&
     image.name.toLowerCase().includes(search.toLowerCase())
@@ -207,6 +213,13 @@ function formatSize(bytes: number): string {
                 <div
                   className="relative flex items-center justify-center overflow-hidden"
                   style={{ height: 235 }}
+                  tabIndex={0}
+                  role="group"
+                  aria-label="Reference preview; use left and right arrow keys"
+                  onKeyDown={(event) => {
+                    if (event.key === "ArrowLeft") { event.preventDefault(); navigate(-1); }
+                    if (event.key === "ArrowRight") { event.preventDefault(); navigate(1); }
+                  }}
                 >
                   <img
                     src={selected.url}

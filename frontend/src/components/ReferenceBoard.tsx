@@ -166,6 +166,13 @@ function formatSize(bytes: number): string {
       // Storage may be unavailable in private browsing.
     }
   }, [accent]);
+
+  function updateNotes(value: string) {
+    if (!selectedId) return;
+    setImages((current) => current.map((image) =>
+      image.id === selectedId ? { ...image, notes: value.slice(0, 1200) } : image
+    ));
+  }
   const visibleImages = images.filter((image) =>
     (!favoritesOnly || image.favorite) &&
     image.name.toLowerCase().includes(search.toLowerCase())
@@ -303,6 +310,9 @@ function formatSize(bytes: number): string {
               <label className="flex items-center gap-3">Opacity<input aria-label="Opacity" className="ml-auto w-28" type="range" min={10} max={100} step={5} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))}/><span className="w-8 text-right font-mono text-[10px]">{imageOpacity}</span></label>
               <button type="button" onClick={resetAdjustments} className="rounded-lg border border-current/20 px-2 py-1">Reset adjustments</button>
             </div>
+            {selected && <label className="mt-4 block text-xs">Drawing notes
+              <textarea className="mt-1 w-full rounded-lg border border-slate-500/30 bg-slate-900 p-2 text-xs text-white" rows={3} value={selected.notes} maxLength={1200} onChange={(event) => updateNotes(event.target.value)} placeholder="Lighting, shapes, proportions..." />
+            </label>}
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-60">Reference library</h3>

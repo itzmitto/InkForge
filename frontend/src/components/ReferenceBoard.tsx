@@ -27,6 +27,7 @@ function formatSize(bytes: number): string {
   const [rotation, setRotation] = useState(0);
   const [flippedX, setFlippedX] = useState(false);
   const [flippedY, setFlippedY] = useState(false);
+  const [grayscale, setGrayscale] = useState(false);
   const accent = "#93c5fd";
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
@@ -146,7 +147,7 @@ function formatSize(bytes: number): string {
                     alt={`Reference: ${selected.name}`}
                     className="max-h-full max-w-full"
                     draggable={false}
-                    style={{ transform: `scale(${zoom / 100}) rotate(${rotation}deg) scaleX(${flippedX ? -1 : 1}) scaleY(${flippedY ? -1 : 1})` }}
+                    style={{ transform: `scale(${zoom / 100}) rotate(${rotation}deg) scaleX(${flippedX ? -1 : 1}) scaleY(${flippedY ? -1 : 1})`, filter: `grayscale(${grayscale ? 100 : 0}%)` }}
                   />
                 </div>
               ) : (
@@ -171,6 +172,7 @@ function formatSize(bytes: number): string {
               <button type="button" onClick={() => setRotation((value) => (value + 90) % 360)} className="rounded-lg border border-current/20 px-2 py-1">Rotate 90°</button>
               <button type="button" onClick={() => setFlippedX((value) => !value)} className="ml-2 rounded-lg border border-current/20 px-2 py-1">Flip horizontal</button>
               <button type="button" onClick={() => setFlippedY((value) => !value)} className="ml-2 rounded-lg border border-current/20 px-2 py-1">Flip vertical</button>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={grayscale} onChange={(event) => setGrayscale(event.target.checked)}/>Grayscale</label>
             </div>
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">

@@ -38,7 +38,7 @@ function formatSize(bytes: number): string {
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [search, setSearch] = useState("");
   const [sortByName, setSortByName] = useState(false);
-  const accent = "#93c5fd";
+  const [accent, setAccent] = useState("#93c5fd");
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
 
@@ -208,6 +208,15 @@ function formatSize(bytes: number): string {
                 addFiles(event.dataTransfer.files);
               }}
             >Drop image files here</div>
+            <label className="mt-3 flex items-center justify-between gap-2 text-xs">
+              Accent color
+              <select aria-label="Reference board accent" value={accent} onChange={(event) => setAccent(event.target.value)} className="rounded border border-slate-500/40 bg-slate-800 px-2 py-1 text-white">
+                <option value="#93c5fd">Glacier</option>
+                <option value="#c4b5fd">Iris</option>
+                <option value="#86efac">Moss</option>
+                <option value="#fbbf24">Amber</option>
+              </select>
+            </label>
             <div className="mt-4 overflow-hidden rounded-xl border border-slate-500/20 bg-[#111827]">
               {selected ? (
                 <div

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 type ReferenceImage = {
   id: string;
   name: string;
@@ -38,7 +38,16 @@ function formatSize(bytes: number): string {
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [search, setSearch] = useState("");
   const [sortByName, setSortByName] = useState(false);
-  const [accent, setAccent] = useState("#93c5fd");
+  const [accent, setAccent] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem("inkforge-ref-accent");
+      return saved && ["#93c5fd", "#c4b5fd", "#86efac", "#fbbf24"].includes(saved)
+        ? saved
+        : "#93c5fd";
+    } catch {
+      return "#93c5fd";
+    }
+  });
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
 
@@ -146,6 +155,14 @@ function formatSize(bytes: number): string {
     const index = images.findIndex((image) => image.id === selectedId);
     setSelectedId(images[(index + delta + images.length) % images.length].id);
   }
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("inkforge-ref-accent", accent);
+    } catch {
+      // Storage may be unavailable in private browsing.
+    }
+  }, [accent]);
   const visibleImages = images.filter((image) =>
     (!favoritesOnly || image.favorite) &&
     image.name.toLowerCase().includes(search.toLowerCase())

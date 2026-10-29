@@ -49,6 +49,7 @@ function formatSize(bytes: number): string {
     }
   });
   const [light, setLight] = useState(false);
+  const [compact, setCompact] = useState(false);
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
 
@@ -239,11 +240,14 @@ function formatSize(bytes: number): string {
             <button type="button" onClick={() => setLight((current) => !current)} className="mt-2 rounded-lg border border-current/20 px-3 py-1.5 text-xs">
               {light ? "Use dark board" : "Use light board"}
             </button>
+            <button type="button" onClick={() => setCompact((current) => !current)} className="ml-2 mt-2 rounded-lg border border-current/20 px-3 py-1.5 text-xs">
+              {compact ? "Comfortable spacing" : "Compact spacing"}
+            </button>
             <div className="mt-4 overflow-hidden rounded-xl border border-slate-500/20 bg-[#111827]">
               {selected ? (
                 <div
                   className="relative flex items-center justify-center overflow-hidden"
-                  style={{ height: 235 }}
+                  style={{ height: compact ? 155 : 235 }}
                   tabIndex={0}
                   role="group"
                   aria-label="Reference preview; use left and right arrow keys"

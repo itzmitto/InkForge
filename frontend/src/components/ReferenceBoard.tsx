@@ -225,6 +225,7 @@ function formatSize(bytes: number): string {
                 addFiles(event.dataTransfer.files);
               }}
             >Drop image files here</div>
+            <p className="mt-2 font-mono text-[11px] opacity-60">{images.length} / {MAX_IMAGES} references</p>
             <label className="mt-3 flex items-center justify-between gap-2 text-xs">
               Accent color
               <select aria-label="Reference board accent" value={accent} onChange={(event) => setAccent(event.target.value)} className="rounded border border-slate-500/40 bg-slate-800 px-2 py-1 text-white">

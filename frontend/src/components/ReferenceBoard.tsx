@@ -84,6 +84,21 @@ function formatSize(bytes: number): string {
     setMessage("Board cleared.");
   }
 
+  function resetAdjustments() {
+    setZoom(100);
+    setRotation(0);
+    setFlippedX(false);
+    setFlippedY(false);
+    setGrayscale(false);
+    setSepia(false);
+    setBrightness(100);
+    setContrast(100);
+    setSaturation(100);
+    setBlur(0);
+    setFit("contain");
+    setImageOpacity(100);
+  }
+
   const visibleImages = images;
 
   return (
@@ -187,6 +202,7 @@ function formatSize(bytes: number): string {
               <label className="flex items-center gap-3">Blur<input aria-label="Blur" className="ml-auto w-28" type="range" min={0} max={12} step={1} value={blur} onChange={(event) => setBlur(Number(event.target.value))}/><span className="w-8 text-right font-mono text-[10px]">{blur}</span></label>
               <button type="button" onClick={() => setFit((value) => value === "contain" ? "cover" : "contain")} className="rounded-lg border border-current/20 px-2 py-1">Image fit: {fit}</button>
               <label className="flex items-center gap-3">Opacity<input aria-label="Opacity" className="ml-auto w-28" type="range" min={10} max={100} step={5} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))}/><span className="w-8 text-right font-mono text-[10px]">{imageOpacity}</span></label>
+              <button type="button" onClick={resetAdjustments} className="rounded-lg border border-current/20 px-2 py-1">Reset adjustments</button>
             </div>
             <div className="mt-4 border-t border-current/10 pt-3">
               <div className="mb-2 flex items-center justify-between gap-2">

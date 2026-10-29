@@ -48,6 +48,7 @@ function formatSize(bytes: number): string {
       return "#93c5fd";
     }
   });
+  const [light, setLight] = useState(false);
 
   const selected = images.find((image) => image.id === selectedId) ?? null;
 
@@ -187,7 +188,7 @@ function formatSize(bytes: number): string {
           <section
             id="inkforge-reference-panel"
             aria-label="InkForge reference board"
-            className={"max-h-[76vh] w-[min(92vw,420px)] overflow-y-auto rounded-2xl border border-slate-700 bg-[#0d1726] p-4 text-slate-100 shadow-2xl"}
+            className={`w-[min(92vw,420px)] overflow-y-auto rounded-2xl border p-4 shadow-2xl max-h-[76vh] ${light ? "border-slate-300 bg-slate-50 text-slate-950" : "border-slate-700 bg-[#0d1726] text-slate-100"}`}
           >
             <div className="mb-4 flex items-center justify-between gap-2">
               <div>
@@ -235,6 +236,9 @@ function formatSize(bytes: number): string {
                 <option value="#fbbf24">Amber</option>
               </select>
             </label>
+            <button type="button" onClick={() => setLight((current) => !current)} className="mt-2 rounded-lg border border-current/20 px-3 py-1.5 text-xs">
+              {light ? "Use dark board" : "Use light board"}
+            </button>
             <div className="mt-4 overflow-hidden rounded-xl border border-slate-500/20 bg-[#111827]">
               {selected ? (
                 <div

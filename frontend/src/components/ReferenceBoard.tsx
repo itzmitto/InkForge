@@ -118,6 +118,28 @@ function formatSize(bytes: number): string {
     link.click();
     link.remove();
   }
+
+  async function copyReference() {
+    if (!selected) return;
+    try {
+      const blob = await selected.file.arrayBuffer();
+      const bitmap = await createImageBitmap(new Blob([blob], { type: selected.file.type }));
+      const canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Canvas unavailable");
+      context.drawImage(bitmap, 0, 0);
+      bitmap.close();
+      const png = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((result) => result ? resolve(result) : reject(new Error("PNG conversion failed")), "image/png");
+      });
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": png })]);
+      setMessage("Reference copied as PNG.");
+    } catch {
+      setMessage("Clipboard image copy is not supported here.");
+    }
+  }
   const visibleImages = images.filter((image) =>
     (!favoritesOnly || image.favorite) &&
     image.name.toLowerCase().includes(search.toLowerCase())
@@ -211,6 +233,7 @@ function formatSize(bytes: number): string {
               <button type="button" disabled={!images.length} onClick={clearBoard} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-[11px] text-red-300 disabled:opacity-30">Clear all</button>
               <button type="button" disabled={!selected} onClick={toggleFavorite} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">{selected?.favorite ? "★ Favorited" : "☆ Favorite"}</button>
               <button type="button" disabled={!selected} onClick={downloadReference} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">Download</button>
+              <button type="button" disabled={!selected} onClick={copyReference} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">Copy image</button>
             </div>
             <div className="mt-4 space-y-2 rounded-xl border border-current/10 p-3 text-xs">
               <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Image adjustments</p>

@@ -1,3 +1,4 @@
+import ReferenceBoard from "./components/ReferenceBoard";
 import SketchChecklist from "./components/SketchChecklist";
 import SketchNotes from "./components/SketchNotes";
 import DrawingPrompts from "./components/DrawingPrompts";
@@ -335,6 +336,7 @@ function App() {
               <SketchChecklist />
               <SketchNotes />
               <BreakReminder />
+              <ReferenceBoard />
               <DrawingPrompts />
               <CanvasInspector
                 zoom={zoom}

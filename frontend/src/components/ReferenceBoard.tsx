@@ -173,6 +173,25 @@ function formatSize(bytes: number): string {
       image.id === selectedId ? { ...image, notes: value.slice(0, 1200) } : image
     ));
   }
+
+  function exportMetadata() {
+    if (images.length === 0) return;
+    const contents = JSON.stringify({
+      title: "InkForge Reference Board",
+      exportedAt: new Date().toISOString(),
+      images: images.map(({ name, file, favorite, addedAt, notes }) => ({
+        name, size: file.size, type: file.type, favorite, addedAt, notes
+      })),
+    }, null, 2);
+    const url = URL.createObjectURL(new Blob([contents], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "inkforge-reference-board.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
   const visibleImages = images.filter((image) =>
     (!favoritesOnly || image.favorite) &&
     image.name.toLowerCase().includes(search.toLowerCase())
@@ -293,6 +312,7 @@ function formatSize(bytes: number): string {
               <button type="button" disabled={!selected} onClick={toggleFavorite} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">{selected?.favorite ? "★ Favorited" : "☆ Favorite"}</button>
               <button type="button" disabled={!selected} onClick={downloadReference} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">Download</button>
               <button type="button" disabled={!selected} onClick={copyReference} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">Copy image</button>
+              <button type="button" disabled={!images.length} onClick={exportMetadata} className="rounded-lg border border-current/20 px-3 py-1.5 text-[11px] disabled:opacity-30">Export board JSON</button>
             </div>
             <div className="mt-4 space-y-2 rounded-xl border border-current/10 p-3 text-xs">
               <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Image adjustments</p>

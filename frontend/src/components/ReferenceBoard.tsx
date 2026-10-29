@@ -120,6 +120,16 @@ function formatSize(bytes: number): string {
             >
               + Add reference images
             </button>
+            <div
+              role="region"
+              aria-label="Drop reference images here"
+              className="mt-2 rounded-lg border border-dashed border-slate-500/40 p-3 text-center text-[11px] opacity-70"
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault();
+                addFiles(event.dataTransfer.files);
+              }}
+            >Drop image files here</div>
             <div className="mt-4 overflow-hidden rounded-xl border border-slate-500/20 bg-[#111827]">
               {selected ? (
                 <div
